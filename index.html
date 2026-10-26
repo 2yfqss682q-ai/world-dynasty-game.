@@ -1,0 +1,909 @@
+<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#101d2b"><title>WORLD DYNASTY — Jeu hors ligne</title><style>
+:root{--bg:#0d1926;--bg2:#132436;--panel:#172a3b;--card:#1b3043;--line:#30465b;--line2:#294156;--txt:#ecf2ee;--muted:#96abb8;--gold:#e5c37e;--good:#93ceb4;--bad:#dca6a5;--sea:#0e2639;--shadow:0 14px 44px #030e1888; font-family:'DM Sans',system-ui,sans-serif;color:var(--txt);background:var(--bg);color-scheme:dark}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;overflow-x:hidden}body{background:radial-gradient(ellipse at 15% 0%,#233850 0%,transparent 50%),var(--bg)}button,input,select,textarea{font:inherit;color:inherit}button{cursor:pointer}button:disabled{cursor:not-allowed;opacity:.45}a{color:var(--gold)}.hidden{display:none!important}.boot{display:flex;min-height:100vh;flex-direction:column;justify-content:center;align-items:center;color:var(--gold)}.boot h1{font-family:Georgia,serif;letter-spacing:.18em}.brand-mark{border:1px solid #e0c57d75;border-radius:12px;padding:8px 13px;font-family:Georgia,serif;color:#f1dab0;font-weight:bold;letter-spacing:.1em}.brand-mark span{color:var(--gold);font-size:11px;margin:0 4px}
+.app-shell{min-height:100vh;max-width:1700px;margin:auto;display:grid;grid-template-columns:226px minmax(0,1fr)}.sidebar{border-right:1px solid var(--line2);background:#102131dd;position:sticky;top:0;height:100vh;padding:28px 14px 20px;display:flex;flex-direction:column;gap:26px}.brand-area{padding:0 10px}.brand-title{font-family:'Playfair Display',Georgia,serif;font-size:22px;letter-spacing:.04em}.brand-sub{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-top:3px}.nav-title{font-size:10px;letter-spacing:.17em;text-transform:uppercase;color:#708fa1;padding:0 14px;margin-bottom:13px}.nav-list{display:grid;gap:5px}.nav-item{display:flex;gap:13px;align-items:center;background:transparent;border:0;text-align:left;border-radius:11px;padding:13px 15px;font-size:13px;color:#b7c6d1}.nav-item svg{width:17px;height:17px;opacity:.9}.nav-item.active{background:#304458cc;color:#f1d38f;box-shadow:inset 2px 0 var(--gold)}.sidebar-footer{margin-top:auto;border:1px solid var(--line);border-radius:13px;padding:13px 12px;background:#1a2f42}.sidebar-footer .tiny{font-size:10px;color:var(--muted)}.main{min-width:0;padding:0 32px 44px}.topbar{position:sticky;top:0;z-index:10;background:#101e2cf2;backdrop-filter:blur(12px);margin:0 -32px 24px;padding:16px 32px;border-bottom:1px solid #2f465b;display:flex;align-items:center;justify-content:space-between;gap:16px}.location{display:flex;flex-direction:column;gap:4px}.eyebrow{text-transform:uppercase;letter-spacing:.17em;font-size:10px;color:var(--gold);font-weight:700}.location h1{font-family:'Playfair Display',Georgia,serif;font-size:23px;font-weight:500;margin:0}.time-controls{display:flex;align-items:center;gap:9px;flex-wrap:wrap}.date-area{text-align:right;margin-right:9px}.date-area strong{display:block;font-size:12px;font-weight:700}.date-area span{font-size:10px;color:var(--muted)}.time-pill{border:1px solid var(--line);background:#263c50;border-radius:9px;padding:8px 11px;font-size:12px;color:#d7e0e9}.time-pill.selected{background:#e4c581;color:#142436;border-color:#e4c581;font-weight:800}.more-button{width:36px;height:36px;border-radius:9px;background:#263c50;border:1px solid var(--line);font-size:20px}
+.content-stack{display:flex;flex-direction:column;gap:20px}.intro-row{display:flex;align-items:end;justify-content:space-between;gap:15px}.intro-row h2{font-family:'Playfair Display',Georgia,serif;font-weight:500;font-size:28px;margin:4px 0 2px}.intro-row p{font-size:12px;color:var(--muted);margin:0}.tag{display:inline-flex;align-items:center;gap:6px;border-radius:100px;padding:6px 10px;border:1px solid var(--line);font-size:11px;color:#c6d4dd;background:#1c3345}.dot{height:7px;width:7px;border-radius:50%;background:#9cbfb3;display:inline-block}.dot.off{background:#e0b1a3}.stats-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px}.stat{background:linear-gradient(140deg,#1b3043,#152838);border:1px solid var(--line2);border-radius:14px;padding:18px 17px;min-width:0}.stat .k{display:flex;justify-content:space-between;gap:5px;align-items:center;color:#a6bac6;font-size:11px}.stat .v{font-size:26px;font-weight:600;letter-spacing:-.04em;margin-top:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.stat .hint{font-size:10px;color:var(--muted);margin-top:5px}.stat .good{color:var(--good)}.stat .warn{color:#eacb8f}
+.mid-layout{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(290px,.78fr);gap:18px;align-items:stretch}.panel{background:linear-gradient(155deg,#162c3e,#142637);border:1px solid var(--line);border-radius:17px;min-width:0;overflow:hidden;box-shadow:0 8px 35px #040e181f}.panel-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;padding:19px 20px 10px}.panel h3{font-family:'Playfair Display',Georgia,serif;font-size:18px;font-weight:500;margin:0}.sub{font-size:11px;color:var(--muted);margin:5px 0 0}.map-controls{display:flex;gap:5px;flex-wrap:wrap}.map-controls button{padding:6px 10px;border-radius:7px;background:#1b3548;border:1px solid #35536a;color:#a7bfcf;font-size:10px}.map-controls button.active{background:#d9bd85;color:#142536;border-color:#d9bd85}.map-container{position:relative;padding:0 13px 6px;min-height:300px}.map-container svg{width:100%;height:auto;display:block;min-height:300px;max-height:535px;background:radial-gradient(ellipse at center,#173d4c 0%,#0d2638 80%);border:1px solid #355064;border-radius:12px}.map-water{fill:#15364a;opacity:.75}.landmass{stroke:#718a82;stroke-width:2;fill:#627d73;opacity:.2}.province{stroke:#cad4b5a4;stroke-width:1;cursor:pointer;transition:filter .15s,stroke-width .15s}.province:hover,.province.selected{stroke:#fff2ba;stroke-width:3;filter:brightness(1.18)}.province.player{stroke:#ffe9af;stroke-width:1.6}.nation-label{fill:#f7f5e4;font-size:15px;font-weight:800;letter-spacing:1.1px;pointer-events:none;paint-order:stroke;stroke:#13283d;stroke-width:3px}.map-city{fill:#fff3ba;stroke:#1e3942;stroke-width:2;pointer-events:none}.map-legend{display:flex;justify-content:space-between;padding:8px 18px 14px;gap:10px;color:#8caabd;font-size:10px;flex-wrap:wrap}.legend-dot{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:5px}.map-caption{font-size:10px;color:#88a1b0;padding:0 20px 13px}
+.region-right{display:flex;flex-direction:column;gap:16px}.ruler{padding:0 19px 17px}.ruler-badge{display:flex;gap:13px;align-items:center;border-bottom:1px solid var(--line);padding-bottom:14px;margin-bottom:14px}.ruler-icon{height:54px;width:54px;border-radius:11px;background:#b89f6c;color:#172a36;display:grid;place-items:center;font-size:28px;font-family:Georgia,serif}.ruler-name{font-size:15px;font-weight:700}.ruler-small{color:#9fb4bf;font-size:11px;margin-top:4px}.meta-line{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 0;font-size:12px;border-bottom:1px solid #294255}.meta-line:last-child{border:0}.meta-line span{color:var(--muted)}.meta-line strong{font-size:12px;text-align:right}.meter{height:6px;border-radius:3px;background:#0d1d2d;overflow:hidden;margin-top:4px}.meter span{display:block;height:100%;background:linear-gradient(90deg,#8cb9ae,#e6c989);border-radius:3px}.callout{background:#233b4c;border:1px solid #3b5665;border-radius:12px;padding:12px 14px;font-size:12px;color:#d6e2e8;line-height:1.55}.right-action{width:100%;margin-top:10px}
+.btn{border:1px solid #43586a;background:#294457;border-radius:9px;padding:10px 14px;font-size:12px;font-weight:700}.btn.primary{background:linear-gradient(140deg,#e9ce90,#ceb170);color:#182a37;border-color:#d8bb7f}.btn.ghost{background:#173043;color:#d8e1e8}.btn.danger{color:#ffcfcb;border-color:#a86568;background:#472b39}.btn.small{padding:7px 10px;font-size:11px}.btn.wide{width:100%}.btnrow{display:flex;gap:8px;flex-wrap:wrap}.content-grid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:18px}.scroll-list{max-height:350px;overflow:auto}.chronicle{padding:11px 19px 14px}.logrow{border-bottom:1px solid #294053;padding:10px 0}.logrow:last-child{border-bottom:0}.logrow time{font-size:10px;color:var(--gold)}.logrow p{font-size:12px;line-height:1.5;margin:5px 0;color:#dae6eb}.chips{display:flex;gap:6px;flex-wrap:wrap}.chip{font-size:10px;border-radius:99px;padding:5px 9px;background:#264252;color:#c9dce5;border:1px solid #365269}.section-pad{padding:8px 19px 19px}.data-table{width:100%;border-collapse:collapse;font-size:12px}.data-table th{text-align:left;font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:#96afbc;padding:12px 12px;border-bottom:1px solid #4a6272;white-space:nowrap}.data-table td{padding:12px 12px;border-bottom:1px solid #304657;white-space:nowrap}.data-table tr:last-child td{border-bottom:0}.data-table tr:hover td{background:#2a415333}.data-table tr.clickable{cursor:pointer}.table-wrap{overflow:auto}.num{text-align:right;font-variant-numeric:tabular-nums}.tint{color:var(--gold)}.up{color:#a5d9c6}.down{color:#e4adac}.muted{color:var(--muted)}.tiny{font-size:10px}.detail-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}.detail{padding:13px;border-radius:11px;border:1px solid #334f60;background:#192f41}.detail .label{font-size:10px;color:var(--muted)}.detail .value{font-size:17px;margin-top:5px;font-weight:700}.microbar{height:4px;margin-top:8px;border-radius:3px;background:#0c1c28;overflow:hidden}.microbar span{height:100%;display:block;background:#bfc697}.cards-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.mini-card{background:#21394c;border:1px solid #395366;padding:13px;border-radius:12px}.mini-card h4{font-size:13px;margin:0 0 8px}.mini-card p{font-size:11px;color:var(--muted);line-height:1.5;margin:0 0 10px}.mini-card strong{font-size:15px}.view-title{display:flex;justify-content:space-between;align-items:end;gap:15px}.view-title h2{font-family:'Playfair Display',Georgia,serif;font-size:28px;font-weight:500;margin:0}.view-title p{color:var(--muted);font-size:12px;margin:6px 0 0}.filters{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.filters select{width:auto}.input,.select,.textarea{width:100%;padding:11px 12px;background:#102538;border:1px solid #3c586b;border-radius:9px;outline:none;color:#e8f0ee;min-height:42px}.input:focus,.select:focus,.textarea:focus{border-color:#e4c581}.textarea{min-height:94px;resize:vertical}.field{display:grid;gap:6px}.field label{font-size:11px;color:#c7d6de}.fieldset{display:grid;gap:13px}.field-row{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.form-info{background:#203d50;padding:12px;border-radius:10px;border:1px solid #3d5a6b;font-size:11px;line-height:1.55;color:#bdd1de}.modal-wrap{position:fixed;z-index:40;inset:0;background:#050e18ca;display:flex;justify-content:center;align-items:center;padding:15px}.dialog{background:#172e40;border:1px solid #526a76;border-radius:17px;max-width:530px;width:100%;max-height:85vh;overflow:auto;box-shadow:var(--shadow)}.dialog-top{display:flex;justify-content:space-between;align-items:center;padding:19px 20px;border-bottom:1px solid #3d5564}.dialog-top h3{font-family:Georgia,serif;font-weight:500;margin:0;font-size:21px}.dialog-close{border:0;background:#294052;border-radius:8px;font-size:19px;width:31px;height:31px}.dialog-body{padding:20px}.toast{position:fixed;right:18px;bottom:24px;z-index:100;max-width:410px;border:1px solid #d1b875;background:#273d49;color:#f8ead5;border-radius:10px;padding:14px 16px;box-shadow:var(--shadow);font-size:12px}.mobile-nav{display:none}.resource-primary{display:flex;align-items:center;gap:12px}.dominance-value{font-size:11px;color:#a5d5c4}.warning{color:#e5bcaa}.tabline{display:flex;gap:8px;flex-wrap:wrap}.empty{color:var(--muted);font-size:12px;padding:18px 0;line-height:1.5}.separator{height:1px;background:#324d5f;margin:12px 0}.accent-top{border-top:2px solid #d5b977}.help-card{border-radius:13px;border:1px solid #53677a;padding:14px;background:#23394b}.pill{display:inline-flex;background:#2b4657;padding:5px 9px;border-radius:99px;font-size:10px}.doc-note{font-size:11px;color:#a4b5bf;line-height:1.6}.sim-agent{display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #324c5d;padding:10px 2px;gap:10px}.sim-agent:last-child{border:0}.sim-agent small{color:#9fb4c1;display:block;margin-top:2px}.sim-agent strong{font-size:12px}.ocean-label{font-size:17px;fill:#7eacbb;opacity:.38;letter-spacing:7px;font-family:Georgia,serif}.continent-label{font-size:13px;fill:#d4dbcf;opacity:.75;letter-spacing:2px;font-family:Georgia,serif}
+@media(max-width:1180px){.app-shell{grid-template-columns:182px minmax(0,1fr)}.sidebar{padding:23px 9px}.brand-title{font-size:19px}.nav-item{font-size:12px;padding:12px 10px}.main{padding:0 18px 40px}.topbar{margin:0 -18px 23px;padding:13px 18px}.mid-layout{grid-template-columns:1fr 300px}.stats-grid{gap:9px}.stat{padding:14px 11px}.stat .v{font-size:20px}}
+@media(max-width:920px){.app-shell{grid-template-columns:1fr}.sidebar{display:none}.main{padding:0 15px 104px}.topbar{margin:0 -15px 20px;padding:12px 15px}.location h1{font-size:19px}.time-controls{gap:5px}.time-pill{font-size:11px;padding:8px}.stats-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.mid-layout{grid-template-columns:1fr}.region-right{display:grid;grid-template-columns:1fr 1fr}.content-grid{grid-template-columns:1fr}.mobile-nav{display:flex;position:fixed;z-index:20;bottom:0;left:0;right:0;padding:9px max(8px,env(safe-area-inset-right)) calc(9px + env(safe-area-inset-bottom)) max(8px,env(safe-area-inset-left));justify-content:space-around;gap:2px;background:#101f2df5;backdrop-filter:blur(12px);border-top:1px solid #3e5666}.mobile-nav button{display:grid;justify-items:center;gap:4px;flex:1;border:0;border-radius:8px;padding:8px 0;background:transparent;color:#a7bdc7;font-size:9px}.mobile-nav button.active{color:#f0cf85;background:#2a4051}.mobile-nav svg{width:19px;height:19px}.map-container svg{min-height:240px}.intro-row h2{font-size:25px}}
+@media(max-width:575px){.topbar{align-items:flex-start}.topbar .location h1{font-size:16px}.eyebrow{font-size:9px}.date-area{display:none}.time-pill{padding:7px 8px;font-size:10px}.time-controls{justify-content:end}.intro-row{align-items:start}.intro-row h2{font-size:25px}.stats-grid{gap:9px}.stat .v{font-size:21px}.stat{padding:14px}.panel-head{padding:15px 14px 9px;flex-wrap:wrap}.panel h3{font-size:16px}.map-container{padding:0 8px 3px;min-height:auto}.map-container svg{min-height:220px}.map-controls button{padding:5px 7px;font-size:10px}.region-right{grid-template-columns:1fr}.detail-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.field-row,.cards-grid{grid-template-columns:1fr}.section-pad{padding:8px 13px 14px}.dialog{max-height:88vh}.dialog-body{padding:15px}.map-legend{padding:8px 13px 12px}.view-title h2{font-size:24px}.data-table td,.data-table th{padding:10px 9px}.stat .hint{font-size:9px}}
+/* Ajustements de lisibilité iPhone et cartes */
+.flag{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:middle;box-shadow:0 0 0 1px #ffffff55;margin-right:5px}
+.layerline{padding-top:0;margin-top:-7px}
+.map-controls{padding:6px 14px 9px;display:flex;flex-wrap:wrap;gap:6px}
+.panel-sub{font-size:11px;color:var(--muted);margin-top:4px}
+.panel-head{display:flex;justify-content:space-between;gap:8px;align-items:center}
+.nav-icon{min-width:19px;font-size:19px;line-height:1;color:var(--gold)}
+.mobile-ic{font-size:21px;line-height:1}
+.ruler .btnrow{margin-top:13px}
+.dialog{scrollbar-width:thin}
+textarea::placeholder,input::placeholder{color:#7893a5}
+@media(max-width:575px){.intro-row h2{font-size:23px}.topbar h1 .muted{display:none}.topbar{gap:8px}.time-controls{gap:3px}.time-pill{min-width:34px}.more-button{width:34px;height:34px}.map-container svg{min-height:190px}.main{padding-bottom:115px}.section-pad .detail-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+.continent-cards{grid-template-columns:repeat(3,minmax(0,1fr))}
+@media(max-width:575px){.continent-cards{grid-template-columns:1fr}}
+
+.nav-card{display:flex;flex-direction:column;gap:7px;text-align:left;color:var(--txt);border:1px solid var(--line);background:var(--card);cursor:pointer}.nav-card:hover,.nav-card:focus-visible{border-color:var(--gold);background:#2b4355}.nav-card h4{margin:0}.nav-card p{margin:0;color:var(--muted);font-size:11px}
+</style></head><body><div id="app"><div class="boot">WORLD DYNASTY — chargement du monde</div></div><script>/* WORLD DYNASTY — Monde original, données initiales reproductibles. */
+const START_YEAR = 1800;
+const PLAYER_ID = 10;
+const RESOURCES = [
+  ['petrole','Pétrole','millions de barils',85,['4']],
+  ['gaz','Gaz naturel','milliards de m³',55,['7']],
+  ['charbon','Charbon','millions de tonnes',100,['0','2','5','8']],
+  ['fer','Minerai de fer','millions de tonnes',92,['0','3','6','9']],
+  ['cuivre','Cuivre','milliers de tonnes',880,['1','4','7']],
+  ['or','Or','tonnes',220,['2','5','8']],
+  ['argent','Argent','tonnes',1250,['0','6','9']],
+  ['uranium','Uranium','milliers de tonnes',45,['3']],
+  ['lithium','Lithium','milliers de tonnes',120,['1','8']],
+  ['terres_rares','Terres rares','milliers de tonnes',60,['5']],
+  ['bauxite','Bauxite','millions de tonnes',110,['1','4','9']],
+  ['nickel','Nickel','milliers de tonnes',175,['2','7']],
+  ['cobalt','Cobalt','milliers de tonnes',55,['6','8']],
+  ['titane','Titane','milliers de tonnes',600,['1','3']],
+  ['phosphates','Phosphates','millions de tonnes',170,['0','6']],
+  ['platine','Platine','tonnes',100,['8']],
+  ['tungstene','Tungstène','milliers de tonnes',145,['2','5']],
+  ['soufre','Soufre','milliers de tonnes',320,['3','9']]
+].map(([id,name,unit,base,owners])=>({id,name,unit,base,owners:owners.map(Number),strategic:true}));
+const COMMON = [
+  {id:'bois',name:'Bois',unit:'milliers de m³'},
+  {id:'pierre',name:'Pierre',unit:'milliers de tonnes'},
+  {id:'argile',name:'Argile',unit:'milliers de tonnes'},
+  {id:'eau',name:'Eau douce',unit:'millions de m³'},
+  {id:'poisson',name:'Poissons',unit:'milliers de tonnes'},
+  {id:'coton',name:'Fibres textiles',unit:'milliers de tonnes'},
+  {id:'sel',name:'Sel',unit:'milliers de tonnes'},
+  {id:'cereales',name:'Céréales',unit:'milliers de tonnes'}
+];
+const CONTINENTS = [
+  {id:0,name:'Vélaris',subtitle:'Terres des vallées et des cités',viewBox:'45 65 470 345'},
+  {id:1,name:'Orménie',subtitle:'Montagnes du soleil levant',viewBox:'680 65 475 340'},
+  {id:2,name:'Thaléa',subtitle:'Littoraux, steppes et forêts',viewBox:'330 395 565 250'}
+];
+const NATIONS = [
+  {id:0,name:'Royaume de Vael',short:'Vael',continent:0,leader:'Reine Serida II',regime:'Monarchie parlementaire',capital:'Varec',color:'#9ab5d4',corners:[[93,119],[268,111],[278,228],[83,226]],trait:'prudente',goal:'réformes civiles',population:2850000},
+  {id:1,name:'République de Dorsane',short:'Dorsane',continent:0,leader:'Premier consul Théo Marcan',regime:'République marchande',capital:'Dorane',color:'#9cb9a2',corners:[[273,107],[469,118],[469,227],[278,227]],trait:'calculateur',goal:'puissance marchande',population:3410000},
+  {id:2,name:'Principauté de Kelvorn',short:'Kelvorn',continent:0,leader:'Prince Orven III',regime:'Principauté héréditaire',capital:'Kelma',color:'#d5bd99',corners:[[85,231],[279,233],[274,351],[100,348]],trait:'méfiant',goal:'défense frontalière',population:1900000},
+  {id:3,name:'Union de Nacérie',short:'Nacérie',continent:0,leader:'Chancelière Eline Sor',regime:'Fédération provinciale',capital:'Nacrel',color:'#c2a5bd',corners:[[281,233],[469,233],[466,342],[278,351]],trait:'méthodique',goal:'éducation populaire',population:3020000},
+  {id:4,name:'Sultanat de Mazir',short:'Mazir',continent:1,leader:'Sultan Marwan al-Safir',regime:'Sultanat dynastique',capital:'Masara',color:'#d8b882',corners:[[723,105],[919,106],[922,232],[715,227]],trait:'audacieux',goal:'routes maritimes',population:2800000},
+  {id:5,name:'Ligue de Torvésie',short:'Torvésie',continent:1,leader:'Protectrice Ivara Sen',regime:'Ligue de cités',capital:'Torse',color:'#97bab1',corners:[[925,108],[1106,120],[1110,230],[930,233]],trait:'opportuniste',goal:'innovation et richesses',population:2380000},
+  {id:6,name:'Empire de Rhovanie',short:'Rhovanie',continent:1,leader:'Empereur Lucan V',regime:'Empire héréditaire',capital:'Rhovel',color:'#b4acd7',corners:[[719,235],[918,238],[920,346],[727,351]],trait:'orgueilleux',goal:'expansion régionale',population:4100000},
+  {id:7,name:'Confédération d’Ysara',short:'Ysara',continent:1,leader:'Première déléguée Alina Ker',regime:'Confédération de cantons',capital:'Ysar',color:'#d69e9b',corners:[[925,237],[1110,234],[1094,349],[925,349]],trait:'pacifique',goal:'stabilité et commerce',population:3120000},
+  {id:8,name:'Couronne de Salme',short:'Salme',continent:2,leader:'Roi Théodar IV',regime:'Monarchie militaire',capital:'Salmor',color:'#a8b8d8',corners:[[370,424],[530,421],[532,610],[384,613]],trait:'belliqueux',goal:'domination territoriale',population:2510000},
+  {id:9,name:'République de Cyralie',short:'Cyralie',continent:2,leader:'Présidente Marielle Vos',regime:'République civique',capital:'Cyral',color:'#b0c399',corners:[[535,427],[695,426],[700,610],[534,608]],trait:'diplomate',goal:'prospérité sociale',population:2970000},
+  {id:10,name:'Souveraineté d’Astérie',short:'Astérie',continent:2,leader:'Le Souverain',regime:'Souveraineté constitutionnelle',capital:'Astéria',color:'#e9c579',corners:[[703,420],[856,427],[846,604],[704,611]],trait:'joueur',goal:'défini par le joueur',population:3280000}
+];
+const PROVINCE_PARTS=['Nord-Ouest','Nord-Est','Sud-Ouest','Sud-Est'];
+const PROJECTS={
+  routes:{label:'Voies et ponts',cost:135,duration:42,field:'roads',gain:.065},
+  fermes:{label:'Irrigation et fermes',cost:160,duration:64,field:'farms',gain:.085},
+  hopital:{label:'Soins et dispensaires',cost:190,duration:72,field:'health',gain:.06},
+  ecoles:{label:'Écoles et formation',cost:145,duration:88,field:'education',gain:.075},
+  eau:{label:'Adduction d’eau',cost:150,duration:49,field:'water',gain:.07},
+  logement:{label:'Logements et quartiers',cost:175,duration:75,field:'housing',gain:.075},
+  port:{label:'Infrastructure portuaire',cost:250,duration:115,field:'ports',gain:.065},
+  mines:{label:'Galeries et exploitations',cost:260,duration:90,field:'mines',gain:.13},
+  ateliers:{label:'Ateliers manufacturiers',cost:205,duration:76,field:'industry',gain:.085},
+  fortifications:{label:'Remparts et arsenaux',cost:240,duration:105,field:'forts',gain:.11}
+};
+const TECHNOLOGIES={
+  geologie:{label:'Relevés géologiques',cost:450,duration:180,unlock:1800},
+  vapeur:{label:'Machines à vapeur',cost:620,duration:250,unlock:1800},
+  medecine:{label:'Hygiène et médecine',cost:520,duration:210,unlock:1800},
+  telegraphe:{label:'Télégraphe électrique',cost:1150,duration:310,unlock:1830},
+  raffinage:{label:'Raffinage pétrolier',cost:1250,duration:360,unlock:1845},
+  electricite:{label:'Électricité industrielle',cost:1850,duration:400,unlock:1870},
+  nucleaire:{label:'Physique nucléaire appliquée',cost:8000,duration:700,unlock:1930}
+};
+const DEFAULT_LAWS={press:'libre',assembly:'autorisé',slavery:'interdit',conscription:'volontaire',tariff:7,judicial:'civil'};
+const ACTION_TYPES=['law','policy','budget','project','research','recruit','demobilize','relief','explore','extract','message','gift','propose','respond','declare_war','peace','loan','trade','spy'];
+
+
+const cp = obj => JSON.parse(JSON.stringify(obj));
+const clamp = (v,min,max) => Math.max(min,Math.min(max,v));
+const rnd = (v,p=3) => Number(v.toFixed(p));
+function random(s){s.seed=(Math.imul(s.seed,1664525)+1013904223)>>>0;return s.seed/4294967296;}
+function between(s,a,b){return a+(b-a)*random(s);}
+function sum(items,key){return items.reduce((a,x)=>a+(typeof key==='function'?key(x):x[key]),0);}
+function transfer(s,from,to,amount,reason){
+  if(!Number.isFinite(amount)||amount<0)throw Error('Montant monétaire invalide');
+  const [ownerA,accA]=from; const [ownerB,accB]=to;
+  const a=s.countries[ownerA],b=s.countries[ownerB];
+  if(!a||!b||!['treasury','privateWealth'].includes(accA)||!['treasury','privateWealth'].includes(accB))throw Error('Compte invalide');
+  if(a[accA]+.000001<amount)throw Error(`${a.short}: fonds insuffisants`);
+  if(amount===0)return;
+  a[accA]=rnd(a[accA]-amount,5);b[accB]=rnd(b[accB]+amount,5);
+  s.ledger.push({id:s.nextLedger++,day:s.day,from:`${ownerA}:${accA}`,to:`${ownerB}:${accB}`,amount: rnd(amount,5),reason});
+  if(s.ledger.length>3000)s.ledger.splice(0,s.ledger.length-3000);
+}
+function event(s,kind,text,actors=[],extra={}){
+  const ev={id:s.nextEvent++,day:s.day,date:dateString(s.day),kind,text,actors,...extra};
+  s.events.push(ev);if(s.events.length>1000)s.events.splice(0,s.events.length-1000);
+  return ev;
+}
+function dateString(day){const d=new Date(Date.UTC(START_YEAR,0,1));d.setUTCDate(d.getUTCDate()+day);return new Intl.DateTimeFormat('fr-FR',{day:'numeric',month:'long',year:'numeric',timeZone:'UTC'}).format(d);}
+const population=c=>sum(c.provinces,'population');
+const area=c=>sum(c.provinces,'areaKm2');
+const totalWorldPopulation=s=>sum(s.countries,population);
+const playerNation=s=>s.countries[s.playerId];
+const countryById=(s,id)=>s.countries.find(c=>c.id===Number(id));
+function point(q,u,v){const [a,b,c,d]=q;const mix=(p,z,t)=>p+(z-p)*t;return [rnd(mix(mix(a[0],b[0],u),mix(d[0],c[0],u),v),1),rnd(mix(mix(a[1],b[1],u),mix(d[1],c[1],u),v),1)];}
+function polygonArea(poly){let result=0;for(let i=0;i<poly.length;i++){const [x,y]=poly[i], [u,v]=poly[(i+1)%poly.length];result+=x*v-u*y;}return Math.abs(result)/2;}
+function makeProvinces(s,nation){
+  const weights=[.21,.27,.24,.28];const total= nation.population;let allocated=0;
+  return PROVINCE_PARTS.map((name,j)=>{
+    const u=j%2*.5,v=Math.floor(j/2)*.5;
+    const square=[point(nation.corners,u,v),point(nation.corners,u+.5,v),point(nation.corners,u+.5,v+.5),point(nation.corners,u,v+.5)];
+    const pop=j===3?total-allocated:Math.round(total*weights[j]);allocated+=pop;
+    return {id:`p${nation.id}-${j}`,countryId:nation.id,name:`${name} de ${nation.short}`,polygon:square,
+      areaKm2:Math.max(1,Math.round(polygonArea(square)*25)),population:pop,terrain:['vallées','plateaux','collines','plaines'][j],
+      fertility:rnd(between(s,.46,.90)),water:rnd(between(s,.48,.88)),roads:rnd(between(s,.32,.71)),
+      farms:rnd(between(s,.45,.82)),health:rnd(between(s,.47,.79)),education:rnd(between(s,.30,.73)),
+      housing:rnd(between(s,.45,.75)),industry:rnd(between(s,.23,.59)),ports:rnd(between(s,.10,.34)),
+      mines:rnd(between(s,.1,.33)),forts:rnd(between(s,.11,.31)),unrest:rnd(between(s,.06,.19)),
+      rainfall:rnd(between(s,.47,.8)),sanitation:rnd(between(s,.4,.76)),hunger:.01,
+      birthsCarry:0,deathsCarry:0,buildings:[],jobs:Math.round(pop*.47),urbanization:rnd(between(s,.17,.48)),
+      pollution:rnd(between(s,.02,.13)),soilDepletion:0,foodFlow:0,lifeExpectancy:Math.round(between(s,37,55))};
+  });
+}
+function getInitialReserves(s,c){
+  const reserves={}; const stocks={};
+  for(const r of RESOURCES){
+    const second=r.base; // Règle : les autres pays ont chacun <= base, et le joueur en a au moins 125 fois plus.
+    const owned =c.id===PLAYER_ID||r.owners.includes(c.id);
+    reserves[r.id]=!owned?0:(c.id===PLAYER_ID?rnd(second*135,3):rnd(second*between(s,.38,1),3));
+    stocks[r.id]=owned&&!['petrole','gaz','uranium','lithium','terres_rares'].includes(r.id)?rnd(Math.min(reserves[r.id]*.00011,20),5):0;
+  }
+  for(const r of COMMON){
+    reserves[r.id]=rnd(between(s,800,4500),2);
+    stocks[r.id]=rnd(between(s,9,75),3);
+  }
+  stocks.cereales=rnd(c.population*.085/1000,4);
+  return {reserves,stocks};
+}
+function initialTech(s,c){return {levels:{agriculture:Math.round(between(s,1,3)),navigation:Math.round(between(s,1,3)),metallurgie:Math.round(between(s,1,3))},known:['agriculture','navigation','metallurgie'],progress:[]};}
+function createWorld(seed=26101800){
+  const s={schema:3,worldId:'MD-11-3C-1800',seed:seed>>>0,initialSeed:seed>>>0,day:0,playerId:PLAYER_ID,
+    continents:cp(CONTINENTS),countries:[],agents:[],events:[],ledger:[],projects:[],orders:[],proposals:[],
+    treaties:[],wars:[],intelligence:[],shipments:[],migrations:[],nextShipment:1,nextMigration:1,nextEvent:1,nextLedger:1,nextOrder:1,nextProject:1,nextProposal:1,nextWar:1,
+    rules:{strategicMinRatio:100,startingRatio:135,geologyDoesNotImplyProduction:true,countryCount:11,continents:3},
+    mode:'local',speed:0,version:'1.1.0',notes:[]};
+  for(const n of NATIONS){
+    const p=makeProvinces(s,n); const stock=getInitialReserves(s,n);
+    const c={...cp(n),provinces:p,treasury:rnd(between(s,1400,3200),2),privateWealth:rnd(between(s,6500,13500),2),
+      debt:[],loansGiven:[],taxRate:rnd(between(s,.13,.22),3),tariff:7,regime:n.regime,
+      legitimacy:rnd(between(s,.57,.89)),stability:rnd(between(s,.53,.81)),approval:rnd(between(s,.42,.75)),
+      inflation:0.021,interestRate:.045,gdpAnnual:0,tradeBalance:0,exportAnnual:0,importAnnual:0,
+      budget:{services:.45,administration:.14,defense:.20,infrastructure:.13,research:.08},
+      soldiers:Math.round(between(s,7800,22000)),militaryReadiness:rnd(between(s,.48,.81)),navy:rnd(between(s,.12,.65)),
+      militaryEquipment:rnd(between(s,.47,.83)),warExhaustion:0,
+      rights:cp(DEFAULT_LAWS),relations:{},messages:[],production:{grain:0,mining:{}},
+      governors:[],laws:[],industry:{agriculture:.33,crafts:.22,trade:.18,industry:.14,services:.13},
+      literacy:rnd(between(s,.23,.55)),healthIndex:rnd(between(s,.4,.79)),unemployment:rnd(between(s,.04,.16)),
+      fertilityRate:rnd(between(s,2.5,5.9)),medianAge:Math.round(between(s,18,29)),
+      leaderAge:Math.round(between(s,29,62)),succession:['élection','succession dynastique','désignation par conseil'][n.id%3],
+      reserves:stock.reserves,stocks:stock.stocks,tech:initialTech(s,n),
+      policy:{welfare:.2,press:1,openBorders:1,antiCorruption:.5,educationPriority:.4},marketPrices:{cereales:1,bois:1.2,pierre:1.1,fer:1.7,petrole:4.5},
+      corruption:rnd(between(s,.06,.31)),migrationNet:0,immigrants:0,emigrants:0,cashFlow:{tax:0,spending:0,army:0,interest:0},history:[]};
+    s.countries.push(c);
+  }
+  for(const c of s.countries){
+    c.gdpAnnual=rnd(computeGDP(c),2);
+    for(const d of s.countries)if(d.id!==c.id)c.relations[d.id]=rnd(between(s,-.37,.53));
+    if(c.id!==PLAYER_ID) s.agents.push({countryId:c.id,persona:c.trait,objective:c.goal,
+      privateMemory:[],inbox:[],nextDecisionDay:12+c.id*2,lastDecisionDay:0,lastSource:'contrôleur local',
+      patience:rnd(between(s,.25,.85)),risk:rnd(between(s,.15,.9)),autonomy:'agent individuel'});
+  }
+  event(s,'monde','Fondation du monde : trois continents, onze États. Dix dirigeants autonomes et une souveraineté jouée.',s.countries.map(c=>c.id));
+  event(s,'resource',`Astérie dispose de tous les ${RESOURCES.length} minerais et énergies stratégiques; chaque réserve initiale dépasse au moins 100 fois celle du deuxième détenteur.`,[PLAYER_ID]);
+  verifyWorld(s,{initial:true});return s;
+}
+function computeGDP(c){
+  return sum(c.provinces,p=>p.population*.00103*(.40+.22*p.roads+.18*p.education+.14*p.industry+.12*p.health+.12*p.farms)) * (1+0.08*(c.tech.levels.agriculture-1));
+}
+function nationalStats(c){
+  const pop=population(c),size=area(c), num=c.provinces.length;
+  const avg=k=>num?rnd(sum(c.provinces,p=>p[k])/num,3):0;
+  return {population:pop,areaKm2:size,density:rnd(pop/Math.max(1,size),2),
+    gdpAnnual:rnd(c.gdpAnnual,2),gdpPerCapita:rnd(c.gdpAnnual*1e6/Math.max(1,pop),2),
+    treasury:c.treasury,privateWealth:c.privateWealth,debt:rnd(sum(c.debt,'principal'),2),
+    grain:c.stocks.cereales,grainCoverDays:Math.round(c.stocks.cereales/Math.max(.0001,pop*.295/365/1000)),
+    roads:avg('roads'),education:avg('education'),health:avg('health'),unrest:avg('unrest'),fertility:avg('fertility'),
+    literacy:c.literacy,taxes:c.taxRate,soldiers:c.soldiers,readiness:c.militaryReadiness,
+    strategicKnown:RESOURCES.filter(r=>c.reserves[r.id]>0).length, migrationNet:c.migrationNet||0,immigrants:c.immigrants||0,emigrants:c.emigrants||0};
+}
+function resourceDominance(s){
+  const p=s.countries[s.playerId]; return RESOURCES.map(r=>{
+    const others=s.countries.filter(c=>c.id!==s.playerId).map(c=>({id:c.id,value:c.reserves[r.id]})).filter(x=>x.value>0).sort((a,b)=>b.value-a.value);
+    const second=others[0]?.value??0;
+    return {id:r.id,name:r.name,unit:r.unit,player:p.reserves[r.id],second,secondCountry:others[0]?.id??null,
+      countriesWithDeposit:others.length+1,ratio:second>0?rnd(p.reserves[r.id]/second,2):null};
+  });
+}
+function verifyWorld(s,{initial=false}={}){
+  if((s.migrations||[]).some(m=>m.count<0)|| (s.shipments||[]).some(sh=>sh.quantity<0||sh.delivered<0||sh.loss<0||sh.delivered+sh.loss>sh.quantity+.00005))throw Error('Flux de marchandises ou personnes invalides');
+  if(s.countries.length!==11||s.agents.length!==10||s.continents.length!==3||s.playerId!==10)throw Error('Configuration du monde incorrecte');
+  const ids=new Set(s.countries.map(c=>c.id));if(ids.size!==11)throw Error('Identifiants dupliqués');
+  let areaTotal=0;
+  for(const c of s.countries){
+    for(const k of ['treasury','privateWealth','taxRate','legitimacy','soldiers','immigrants','emigrants'])if(!Number.isFinite(c[k])||c[k]<0)throw Error(`${c.short} possède une valeur invalide : ${k}`);
+    if(!c.provinces.length)throw Error('Nation sans provinces');
+    for(const p of c.provinces){if(p.population<0||p.areaKm2<=0)throw Error('Province invalide');areaTotal+=p.areaKm2;}
+    for(const r of RESOURCES){if(!Number.isFinite(c.reserves[r.id])||!Number.isFinite(c.stocks[r.id])||c.reserves[r.id]<0||c.stocks[r.id]<0)throw Error('Ressource stratégique négative');}
+  }
+  if(initial){
+    for(const r of resourceDominance(s))if(!(r.player>0)||r.second>0 && r.player<r.second*100)throw Error(`Déséquilibre stratégique ${r.name}`);
+    if(s.countries.some(c=>c.id!==s.playerId&&RESOURCES.every(r=>c.reserves[r.id]>0)))throw Error('Un rival possède toutes les ressources');
+    const petro=s.countries.filter(c=>c.reserves.petrole>0);if(petro.length!==2)throw Error('Pétrole : 2 propriétaires requis');
+  }
+  return true;
+}
+function spend(s,c,amount,reason){transfer(s,[c.id,'treasury'],[c.id,'privateWealth'],amount,reason);}
+function validNum(v,min,max){return Number.isFinite(Number(v))&&Number(v)>=min&&Number(v)<=max;}
+function target(s,id,c){const other=countryById(s,id);if(!other||other.id===c.id)throw Error('Pays cible invalide');return other;}
+function provinceOf(c,id){const p=c.provinces.find(x=>x.id===id);if(!p)throw Error('Province non contrôlée');return p;}
+function intention(s,c,type,x){
+  if(!ACTION_TYPES.includes(type))throw Error('Action non prévue par le moteur. Aucune conséquence automatique.');
+  if(type==='law'){
+    const allowed={press:['libre','censurée'],assembly:['autorisé','restreint'],slavery:['interdit'],conscription:['volontaire','obligatoire'],judicial:['civil','militaire']};
+    if(!allowed[x.field]?.includes(x.value))throw Error('Loi invalide ou domaine non modifiable');
+    if(c.rights[x.field]===x.value)throw Error('Cette loi est déjà en vigueur');
+    c.rights[x.field]=x.value;c.laws.push({day:s.day,field:x.field,value:x.value});c.legitimacy=clamp(c.legitimacy-.01,0,1);
+    event(s,'politics',`${c.short} adopte une loi : ${x.field} = ${x.value}.`,[c.id]);return;
+  }
+  if(type==='policy'){
+    if(x.field==='taxRate'){if(!validNum(x.value,.02,.48))throw Error('Taux fiscal de 2 à 48 %');c.taxRate=Number(x.value);c.legitimacy=clamp(c.legitimacy-.004,0,1);}
+    else if(x.field==='tariff'){
+      if(!validNum(x.value,0,40))throw Error('Droits de douane : de 0 à 40 %');c.tariff=Number(x.value);
+    }else if(['welfare','press','openBorders','antiCorruption','educationPriority'].includes(x.field)){
+      if(!validNum(x.value,0,1))throw Error('Valeur requise entre 0 et 1');c.policy[x.field]=Number(x.value);
+      c.legitimacy=clamp(c.legitimacy-.003,0,1);
+    } else throw Error('Politique inconnue');
+    event(s,'politics',`${c.short} modifie sa politique « ${x.field} » (${x.value}).`,[c.id]);return;
+  }
+  if(type==='budget'){
+    const b=x.budget;if(!b||Object.keys(c.budget).some(k=>!validNum(b[k],0,1)))throw Error('Budget invalide');
+    if(Math.abs(Object.keys(c.budget).reduce((a,k)=>a+Number(b[k]),0)-1)>.0001)throw Error('Le budget doit faire 100 %');
+    c.budget=Object.fromEntries(Object.keys(c.budget).map(k=>[k,Number(b[k])]));
+    event(s,'politics',`${c.short} adopte un nouveau budget de fonctionnement.`,[c.id]);return;
+  }
+  if(type==='project'){
+    const template=PROJECTS[x.project];if(!template)throw Error('Projet inconnu');
+    const p=provinceOf(c,x.provinceId||c.provinces[0].id);
+    if(c.treasury+1e-6<template.cost)throw Error('Trésorerie insuffisante pour le chantier');
+    spend(s,c,template.cost,`Projet ${template.label}`);
+    const pr={id:s.nextProject++,owner:c.id,provinceId:p.id,type:x.project,label:template.label,
+      started:s.day,finish:s.day+template.duration,cost:template.cost,progress:0,status:'chantier'};
+    s.projects.push(pr);event(s,'construction',`${c.short} lance « ${template.label} » dans ${p.name}.`,[c.id]);return;
+  }
+  if(type==='research'){
+    const t=TECHNOLOGIES[x.technology];if(!t)throw Error('Recherche inconnue');
+    if(START_YEAR+Math.floor(s.day/365)<t.unlock)throw Error(`Technologie prématurée (à partir de ${t.unlock})`);
+    if(c.tech.known.includes(x.technology)||c.tech.progress.some(z=>z.technology===x.technology))throw Error('Recherche déjà présente');
+    if(c.treasury<t.cost)throw Error('Fonds insuffisants pour la recherche');
+    spend(s,c,t.cost,`Recherche ${t.label}`);c.tech.progress.push({technology:x.technology,finish:s.day+t.duration,cost:t.cost});
+    event(s,'science',`${c.short} finance la recherche « ${t.label} ».`,[c.id]);return;
+  }
+  if(type==='recruit'){
+    const count=Math.round(Number(x.count));if(!validNum(count,100,50000))throw Error('Recrutement de 100 à 50 000 personnes');
+    const cost=rnd(count*.005,3);if(c.treasury<cost)throw Error('Fonds insuffisants pour les recrues');
+    if(c.soldiers+count>population(c)*.085)throw Error('Manque de population mobilisable');
+    spend(s,c,cost,'Recrutement militaire');c.soldiers+=count;c.militaryReadiness=clamp(c.militaryReadiness-.002,0,1);
+    if(c.rights.conscription==='obligatoire'){for(const p of c.provinces)p.unrest=clamp(p.unrest+count/population(c)*.13,0,1);}
+    event(s,'military',`${c.short} recrute ${count.toLocaleString('fr-FR')} militaires.`,[c.id]);return;
+  }
+  if(type==='demobilize'){
+    const count=Math.round(Number(x.count));if(!validNum(count,1,c.soldiers))throw Error('Démobilisation invalide');
+    c.soldiers-=count;event(s,'military',`${c.short} démobilise ${count.toLocaleString('fr-FR')} militaires.`,[c.id]);return;
+  }
+  if(type==='relief'){
+    const amount=Number(x.amount);if(!validNum(amount,10,2000))throw Error('Aide de 10 à 2 000 millions');
+    if(c.treasury<amount)throw Error('Fonds insuffisants');spend(s,c,amount,'Secours à la population');
+    c.approval=clamp(c.approval+amount/15000,0,1);
+    for(const p of c.provinces)p.unrest=clamp(p.unrest-amount/(c.provinces.length*30000),0,1);
+    event(s,'social',`${c.short} alloue ${amount} M Cr aux secours sociaux.`,[c.id]);return;
+  }
+  if(type==='explore'){
+    if(c.treasury<90)throw Error('Manque de fonds pour l’exploration');
+    spend(s,c,90,'Prospection géologique');
+    const r=RESOURCES.find(z=>z.id===x.resource);if(!r)throw Error('Ressource inconnue');
+    const finds=c.reserves[r.id]>0;
+    c.history.push({day:s.day,type:'prospection',resource:r.id,result:finds?'gisement confirmé':'aucun gisement identifié'});
+    event(s,'geology',`${c.short}: prospection du ${r.name.toLowerCase()} — ${finds?'gisement identifié':'aucun gisement découvert'}.`,[c.id]);return;
+  }
+  if(type==='extract'){
+    const r=RESOURCES.find(z=>z.id===x.resource);if(!r)throw Error('Ressource inconnue');
+    if(c.reserves[r.id]<=0)throw Error('Aucune réserve dans ce pays');
+    if(['petrole','gaz'].includes(r.id)&&!c.tech.known.includes('raffinage'))throw Error('La technologie de raffinage n’est pas maîtrisée');
+    if(r.id==='uranium'&&!c.tech.known.includes('nucleaire'))throw Error('Extraction non maîtrisée à cette époque');
+    const volume=Number(x.quantity);if(!validNum(volume,.01,1000))throw Error('Volume entre 0,01 et 1 000 unités');
+    const mining=rnd(sum(c.provinces,'mines'),2);const capacity=rnd(mining*3,3);
+    if(volume>capacity)throw Error(`Capacité d'extraction par ordre limitée à ${capacity}`);
+    if(c.reserves[r.id]<volume)throw Error('Gisement insuffisant');
+    const cost=rnd(volume*1.2,3);if(c.treasury<cost)throw Error('Extraction non financée');
+    spend(s,c,cost,`Extraction ${r.name}`);c.reserves[r.id]=rnd(c.reserves[r.id]-volume,5);c.stocks[r.id]=rnd(c.stocks[r.id]+volume,5);
+    event(s,'resource',`${c.short} extrait ${volume} ${r.unit} de ${r.name.toLowerCase()}.`,[c.id]);return;
+  }
+  if(type==='message'){
+    const other=target(s,x.target,c),body=String(x.text||'').trim();if(body.length<2||body.length>600)throw Error('Message requis : 2 à 600 caractères');
+    const msg={day:s.day,from:c.id,to:other.id,body,kind:'message'};other.messages.push(msg);c.messages.push({...msg,outgoing:true});
+    event(s,'diplomacy',`${c.short} adresse un message diplomatique à ${other.short}.`,[c.id,other.id]);return;
+  }
+  if(type==='gift'){
+    const other=target(s,x.target,c),amount=Number(x.amount);if(!validNum(amount,1,2000))throw Error('Montant invalide');
+    transfer(s,[c.id,'treasury'],[other.id,'treasury'],amount,'Don diplomatique');
+    other.relations[c.id]=clamp(other.relations[c.id]+.075,-1,1);
+    event(s,'diplomacy',`${c.short} verse ${amount} M Cr à ${other.short}.`,[c.id,other.id]);return;
+  }
+  if(type==='propose'||type==='trade'||type==='loan'){
+    const other=target(s,x.target,c),kind=type==='propose'?(x.kind||'alliance'):type;
+    if(!['alliance','non_agression','paix','commerce','trade','loan'].includes(kind))throw Error('Proposition non reconnue');
+    if(kind==='trade'){
+      if(![...RESOURCES,...COMMON].some(r=>r.id===x.resource))throw Error('Marchandise inconnue');
+      if(!validNum(x.quantity,.001,100000)||!validNum(x.price,.01,10000))throw Error('Contrat de marchandises invalide');
+    }
+    if(kind==='loan'){
+      if(!validNum(x.amount,10,5000)||!validNum(x.rate,0,.3)||!validNum(x.duration,30,3650))throw Error('Prêt invalide');
+    }
+    const id=s.nextProposal++;
+    s.proposals.push({id,from:c.id,to:other.id,kind,resource:x.resource||null,quantity:Number(x.quantity)||0,price:Number(x.price)||0,
+      amount:Number(x.amount)||0,rate:Number(x.rate)||0,duration:Number(x.duration)||0,status:'en attente',
+      day:s.day,expires:s.day+90,comment:String(x.comment||'').slice(0,250)});
+    event(s,'diplomacy',`${c.short} propose un accord (${kind}) à ${other.short}.`,[c.id,other.id],{proposalId:id});return;
+  }
+  if(type==='respond'){
+    const p=s.proposals.find(z=>z.id===Number(x.proposalId));if(!p||p.to!==c.id||p.status!=='en attente')throw Error('Proposition indisponible');
+    if(x.accept!==true && x.accept!==false)throw Error('Réponse requise');
+    if(x.accept){
+      const from=countryById(s,p.from),to=countryById(s,p.to);
+      if(p.kind==='trade'){
+        if(from.stocks[p.resource]<p.quantity)throw Error('Stock du vendeur insuffisant');
+        if(to.treasury<p.price)throw Error('Acheteur sans fonds');
+        const commercialTreaty=s.treaties.some(t=>t.active&&t.kind==='commerce'&&t.members.includes(from.id)&&t.members.includes(to.id));
+        const intercontinental=from.continent!==to.continent;
+        const routeDays=intercontinental?38:13;
+        const roadQuality=(sum(from.provinces,'roads')/from.provinces.length + sum(to.provinces,'roads')/to.provinces.length)/2;
+        const travelDays=Math.max(4,Math.round(routeDays*(1.35-.48*roadQuality)*(commercialTreaty?.85:1)));
+        const logistics=rnd(p.price*(intercontinental?.045:.016)*(commercialTreaty?.75:1),5);
+        // A minimal customs model: the importing merchant sector pays an import duty to its own treasury.
+        // A signed commercial treaty reduces the applicable rate, without inventing money.
+        const duty=rnd(p.price*to.tariff/100*(commercialTreaty?.65:1),5);
+        if(to.treasury+1e-7<p.price+logistics)throw Error('Acheteur sans fonds pour le prix et les transports');
+        if(to.privateWealth+1e-7<duty)throw Error('Importateurs sans fonds pour les droits de douane');
+        transfer(s,[to.id,'treasury'],[from.id,'treasury'],p.price,`Achat ${p.resource} en transit`);
+        if(logistics)transfer(s,[to.id,'treasury'],[to.id,'privateWealth'],logistics,'Transport commercial');
+        if(duty)transfer(s,[to.id,'privateWealth'],[to.id,'treasury'],duty,'Droits de douane sur importations');
+        from.stocks[p.resource]=rnd(from.stocks[p.resource]-p.quantity,5);
+        const sh={id:s.nextShipment++,contractId:p.id,from:from.id,to:to.id,resource:p.resource,quantity:p.quantity,
+          price:p.price,logistics,duty,depart:s.day,arrive:s.day+travelDays,intercontinental,status:'en transit',delivered:0,loss:0};
+        s.shipments.push(sh);
+        event(s,'trade',`Une cargaison de ${p.quantity} ${p.resource} quitte ${from.short} vers ${to.short}; livraison prévue dans ${travelDays} jours.`,[from.id,to.id],{shipmentId:sh.id});
+        from.exportAnnual+=p.price;to.importAnnual+=p.price;from.tradeBalance+=p.price;to.tradeBalance-=p.price;
+      }else if(p.kind==='loan'){
+        if(from.treasury<p.amount)throw Error('Prêteur sans liquidités');
+        transfer(s,[from.id,'treasury'],[to.id,'treasury'],p.amount,'Décaissement du prêt');
+        to.debt.push({creditor:from.id,principal:p.amount,rate:p.rate,due:s.day+p.duration,created:s.day});
+      }else{
+        if(p.kind==='paix'&&!s.wars.some(w=>w.status==='en cours'&&w.participants.includes(from.id)&&w.participants.includes(to.id)))throw Error('Aucune guerre à terminer par ce traité');
+        s.treaties.push({id:`T${s.nextProposal++}`,kind:p.kind,members:[from.id,to.id],signed:s.day,active:true});
+        if(p.kind==='paix'){
+          for(const war of s.wars.filter(w=>w.status==='en cours'&&w.participants.includes(from.id)&&w.participants.includes(to.id))){
+            war.status='terminée';war.finished=s.day;war.peaceful=true;
+            event(s,'peace',`Traité de paix entre ${from.short} et ${to.short}.`,[from.id,to.id]);
+          }
+        }
+      }
+      from.relations[to.id]=clamp(from.relations[to.id]+.09,-1,1);to.relations[from.id]=clamp(to.relations[from.id]+.1,-1,1);
+    }
+    p.status=x.accept?'acceptée':'refusée';p.answerDay=s.day;
+    event(s,'diplomacy',`${c.short} ${x.accept?'accepte':'refuse'} la proposition n°${p.id} de ${countryById(s,p.from).short}.`,[p.from,p.to]);return;
+  }
+  if(type==='declare_war'){
+    const other=target(s,x.target,c);if(s.wars.some(w=>w.status==='en cours'&&w.participants.includes(c.id)&&w.participants.includes(other.id)))throw Error('Guerre déjà en cours');
+    if(c.soldiers<500)throw Error('Armée insuffisante');
+    if(c.continent!==other.continent&&c.navy<.33)throw Error('Flotte insuffisante pour cette guerre outre-mer');
+    s.wars.push({id:s.nextWar++,participants:[c.id,other.id],attacker:c.id,defender:other.id,started:s.day,lastBattle:s.day,
+      status:'en cours',score:0,battles:[],casualties:{[c.id]:0,[other.id]:0}});
+    c.legitimacy=clamp(c.legitimacy-.055,0,1);c.relations[other.id]=-1;other.relations[c.id]=-1;
+    event(s,'war',`${c.short} déclare la guerre à ${other.short}.`,[c.id,other.id]);return;
+  }
+  if(type==='peace'){
+    const war=s.wars.find(w=>w.status==='en cours'&&w.participants.includes(c.id)&&w.participants.includes(Number(x.target)));
+    if(!war)throw Error('Aucun conflit entre ces deux pays');
+    s.proposals.push({id:s.nextProposal++,from:c.id,to:Number(x.target),kind:'paix',status:'en attente',day:s.day,expires:s.day+90});
+    event(s,'diplomacy',`${c.short} demande l'ouverture de négociations de paix.`,war.participants);return;
+  }
+  if(type==='spy'){
+    const other=target(s,x.target,c);if(c.treasury<125)throw Error('Renseignements : fonds insuffisants');
+    spend(s,c,125,'Mission de renseignement');
+    const success=random(s)>.35;
+    const info=success?`Effectifs estimés de ${other.short} : entre ${Math.round(other.soldiers*.8)} et ${Math.round(other.soldiers*1.2)} soldats.`:'Mission sans renseignement exploitable.';
+    s.intelligence.push({for:c.id,about:other.id,day:s.day,text:info,confidence:success?.65:.15});
+    event(s,'intelligence',`${c.short} dépêche une mission de renseignement vers ${other.short}.`,[c.id]);return;
+  }
+}
+function command(s,actorId,type,payload={}){
+  const c=countryById(s,actorId);if(!c)throw Error('Auteur inconnu');
+  if(!ACTION_TYPES.includes(type))throw Error(`Commande inconnue : ${type}`);
+  if(s.orders.length>200)throw Error('File d’ordres saturée');
+  if(!payload||typeof payload!=='object'||Array.isArray(payload))throw Error('Paramètres d’ordre invalides');
+  // Refus immédiat des commandes incohérentes; les contrôles financiers se répètent à l'exécution.
+  const o={id:s.nextOrder++,issued:s.day,actor:c.id,type,payload:cp(payload),status:'en attente'};
+  s.orders.push(o);return o;
+}
+function applyOrders(s){
+  const orders=s.orders.splice(0);
+  for(const o of orders){
+    try{intention(s,countryById(s,o.actor),o.type,o.payload);o.status='appliqué';}
+    catch(e){o.status='refusé';o.reason=e.message;event(s,'rejected',`${countryById(s,o.actor)?.short||'État'} : ordre refusé — ${e.message}.`,[o.actor]);}
+    s.notes.push({day:s.day,id:o.id,status:o.status,reason:o.reason||'',kind:o.type});
+  }
+  s.notes=s.notes.slice(-300);
+}
+function publicSectorDay(s,c){
+  c.gdpAnnual=computeGDP(c);
+  const tax=rnd(Math.min(c.privateWealth*.005,c.gdpAnnual*c.taxRate/365),5);
+  if(tax>0)transfer(s,[c.id,'privateWealth'],[c.id,'treasury'],tax,'Impôts et prélèvements');
+  const ordinary=Math.min(c.treasury,c.gdpAnnual*c.taxRate/365*.71);
+  if(ordinary>0)transfer(s,[c.id,'treasury'],[c.id,'privateWealth'],rnd(ordinary,5),'Services publics et administration');
+  // Les allocations ont un effet marginal sur la qualité des services, soumis à l'usure et au temps.
+  const effort=ordinary/Math.max(1,population(c)/500000);
+  for(const province of c.provinces){
+    province.health=clamp(rnd(province.health+effort*c.budget.services*.000014,6),0,1);
+    province.education=clamp(rnd(province.education+effort*c.budget.research*.000024,6),0,1);
+    province.roads=clamp(rnd(province.roads+effort*c.budget.infrastructure*.00001,6),0,1);
+  }
+  const soldiers=rnd(c.soldiers*.000016,5);const army=Math.min(c.treasury,soldiers);
+  if(army>0)transfer(s,[c.id,'treasury'],[c.id,'privateWealth'],army,'Soldes et approvisionnement militaire');
+  c.cashFlow={tax,spending:rnd(ordinary,3),army:rnd(army,3),interest:0};
+  if(army+1e-5<soldiers)c.militaryReadiness=clamp(c.militaryReadiness-.005,0,1);
+  else c.militaryReadiness=clamp(c.militaryReadiness+.0001*(1-c.warExhaustion),0,1);
+  for(const debt of c.debt){
+    if(debt.principal<=0)continue;
+    const dailyInterest=rnd(debt.principal*debt.rate/365,5);
+    const creditor=countryById(s,debt.creditor);if(creditor&&c.treasury>=dailyInterest&&dailyInterest>0){
+      transfer(s,[c.id,'treasury'],[creditor.id,'treasury'],dailyInterest,'Intérêt sur dette');c.cashFlow.interest+=dailyInterest;
+    }else if(dailyInterest>0)debt.arrears=rnd((debt.arrears||0)+dailyInterest,5);
+    if(s.day>=debt.due&&debt.principal>0&&creditor){
+      const repayment=Math.min(c.treasury,debt.principal);if(repayment>0){transfer(s,[c.id,'treasury'],[creditor.id,'treasury'],repayment,'Remboursement dette');debt.principal=rnd(debt.principal-repayment,5);}
+      if(debt.principal>0&&s.day===debt.due)event(s,'debt',`${c.short} ne rembourse pas entièrement son prêt à échéance.`,[c.id,creditor.id]);
+    }
+  }
+}
+function societyDay(s,c){
+  let produced=0,needed=0,hadFood=c.stocks.cereales;
+  const policy=c.policy;
+  const season=.90+.14*Math.sin(2*Math.PI*(s.day%365)/365);
+  for(const p of c.provinces){
+    if(s.day%30===0)p.rainfall=clamp(rnd(p.rainfall+between(s,-.026,.026)),.05,.96);
+    const grow=p.population*.345/1000/365*p.farms*p.fertility*(.88+.3*p.rainfall)*season*2.05;
+    const consume=p.population*.292/1000/365;
+    produced+=grow;needed+=consume;p.foodFlow=rnd(grow-consume,5);
+  }
+  const spoil=hadFood*(.00008+.0002*(1-c.provinces[0].roads));
+  const supply=hadFood+produced-spoil;const shortage=Math.max(0,needed-supply);const hunger=needed>0?shortage/needed:0;
+  c.stocks.cereales=rnd(Math.max(0,supply-needed),5);c.production.grain=rnd(produced,4);
+  const daysCovered=c.stocks.cereales/Math.max(.000001,needed);
+  c.marketPrices.cereales=rnd(clamp(0.85+40/Math.max(1,daysCovered),.6,8),3);
+  c.inflation=rnd(clamp(c.inflation+(.000025*(c.marketPrices.cereales-1.2))-.000014,-.1,.6),5);
+  for(const p of c.provinces){
+    p.hunger=clamp(rnd(p.hunger*.89+hunger*.11),0,1);
+    const birthsExact=p.population*(.01+.004*c.fertilityRate+.002*(1-p.education))/365 +p.birthsCarry;
+    const births=Math.floor(birthsExact);p.birthsCarry=birthsExact-births;
+    const deathsExact=p.population*(.014+.011*hunger+.005*(1-p.health))/365+p.deathsCarry;
+    const deaths=Math.floor(deathsExact);p.deathsCarry=deathsExact-deaths;
+    p.population=Math.max(0,p.population+births-deaths);
+    const unrestDrift=.0012*hunger+Math.max(0,c.taxRate-.28)*.0006+.00012*c.warExhaustion-.0001*(p.health+policy.welfare);
+    p.unrest=clamp(rnd(p.unrest+unrestDrift,5),0,1);
+    p.roads=clamp(rnd(p.roads-.000013,5),0,1);p.farms=clamp(rnd(p.farms-.000004,5),0,1);
+    p.health=clamp(rnd(p.health-.00007*hunger+ .000006*policy.welfare,5),0,1);
+    p.soilDepletion=clamp(rnd(p.soilDepletion+p.farms*.000002,6),0,1);
+  }
+  c.legitimacy=clamp(rnd(c.legitimacy-.0002*hunger+.000012*(c.approval-.5)-.00009*c.warExhaustion,5),0,1);
+  c.stability=clamp(rnd(c.stability-.00016*hunger-.00006*c.warExhaustion+.00001,5),0,1);
+  c.approval=clamp(rnd(c.approval-.00015*hunger+.000015*(policy.welfare-.2),5),0,1);
+  c.corruption=clamp(rnd(c.corruption+.000003-.000012*policy.antiCorruption,5),0,1);
+  const avgI=sum(c.provinces,'industry')/c.provinces.length,avgRoads=sum(c.provinces,'roads')/c.provinces.length;
+  c.unemployment=clamp(rnd(.20-.18*avgI-.05*avgRoads+.30*hunger+.10*c.warExhaustion,4),.01,.65);
+  c.healthIndex=rnd(sum(c.provinces,'health')/c.provinces.length,4);
+  c.fertilityRate=clamp(rnd(c.fertilityRate-.000001*Math.max(.3,c.literacy),5),1.6,6.9);
+  for(const p of c.provinces)p.jobs=Math.round(p.population*.48*(1-c.unemployment));
+  c.literacy=clamp(rnd(c.literacy+.000007*sum(c.provinces,'education')/4,5),0,1);
+  if(hunger>.12&&s.day%15===0)event(s,'shortage',`Pénurie de céréales en ${c.short}. Les réserves couvrent mal les besoins.`,[c.id]);
+}
+function advanceProjects(s){
+  for(const pr of s.projects){
+    if(pr.status!=='chantier')continue;
+    pr.progress=clamp(rnd((s.day-pr.started)/(pr.finish-pr.started),3),0,1);
+    if(s.day>=pr.finish){
+      const c=countryById(s,pr.owner),p=c?.provinces.find(z=>z.id===pr.provinceId),template=PROJECTS[pr.type];
+      if(!p){pr.status='annulé';continue;}
+      p[template.field]=clamp(rnd(p[template.field]+template.gain),0,1);
+      p.buildings.push({type:pr.type,built:s.day,value:pr.cost,condition:1});pr.status='terminé';
+      event(s,'construction',`${c.short}: les travaux « ${pr.label} » sont achevés dans ${p.name}.`,[c.id]);
+    }
+  }
+  for(const c of s.countries){
+    for(const research of c.tech.progress){
+      if(s.day<research.finish)continue;
+      c.tech.known.push(research.technology);event(s,'science',`${c.short} achève la recherche « ${TECHNOLOGIES[research.technology].label} ».`,[c.id]);
+    }
+    c.tech.progress=c.tech.progress.filter(r=>s.day<r.finish);
+  }
+}
+function yearlySuccession(s){
+  for(const c of s.countries){
+    c.leaderAge++;
+    if(c.id!==s.playerId&&(c.regime.includes('République')||c.regime.includes('Fédération')||c.regime.includes('Confédération'))&&s.day%1825===0){
+      const incumbent=c.leader;const contested=c.approval<.58||random(s)<.3;
+      if(contested){c.leader=`${['Présidente','Chancelier','Délégué'][c.id%3]} ${['Éline','Varec','Alma','Dorian'][Math.floor(random(s)*4)]} ${Math.floor(random(s)*6)+1}`;c.leaderAge=Math.round(between(s,30,62));}
+      event(s,'politics',`${c.short} organise un renouvellement institutionnel : ${contested?`${incumbent} quitte ses fonctions; ${c.leader} lui succède`:'le pouvoir sortant est reconduit'}.`,[c.id]);
+    }
+    const mortality=c.leaderAge>75?.035:c.leaderAge>60?.011:.001;
+    if(random(s)<mortality&&c.id!==s.playerId){
+      const old=c.leader;c.leader=`${['Conseiller','Chancelier','Souverain','Président'][c.id%4]} ${['Alren','Mylia','Tervan','Célan','Orissa'][Math.floor(random(s)*5)]} ${Math.floor(random(s)*8)+1}`;
+      c.leaderAge=Math.round(between(s,27,53));c.legitimacy=clamp(c.legitimacy-.08,0,1);
+      event(s,'politics',`${c.short} : fin du règne de ${old}; ${c.leader} prend la succession.`,[c.id]);
+    }
+  }
+}
+function resolveWars(s){
+  for(const w of s.wars.filter(w=>w.status==='en cours')){
+    const a=countryById(s,w.attacker),b=countryById(s,w.defender);
+    a.warExhaustion=clamp(a.warExhaustion+.00012,0,1);b.warExhaustion=clamp(b.warExhaustion+.00012,0,1);
+    if(s.day-w.lastBattle<14)continue;
+    w.lastBattle=s.day;
+    const strengthA=a.soldiers*a.militaryReadiness*a.militaryEquipment*(.85+.3*random(s));
+    const strengthB=b.soldiers*b.militaryReadiness*b.militaryEquipment*(1.05+.3*random(s));
+    const victor=strengthA>strengthB?a:b,loser=victor===a?b:a;
+    const lossesA=Math.min(a.soldiers,Math.round(b.soldiers*.008*(.8+random(s))));
+    const lossesB=Math.min(b.soldiers,Math.round(a.soldiers*.008*(.8+random(s))));
+    a.soldiers-=lossesA;b.soldiers-=lossesB;
+    const kill=(c,count)=>{const p=c.provinces[0];p.population=Math.max(0,p.population-Math.round(count*.55));};
+    kill(a,lossesA);kill(b,lossesB);
+    w.casualties[a.id]+=lossesA;w.casualties[b.id]+=lossesB;
+    w.score=clamp(w.score+(victor===a?11:-11),-100,100);
+    w.battles.push({day:s.day,victor:victor.id,lossesA,lossesB,score:w.score});
+    event(s,'battle',`Combat entre ${a.short} et ${b.short}. Avantage : ${victor.short}; pertes ${a.short} ${lossesA}, ${b.short} ${lossesB}.`,[a.id,b.id]);
+    if(Math.abs(w.score)>=77||a.soldiers<200||b.soldiers<200){
+      w.status='terminée';w.finished=s.day;
+      const winner=w.score>0?a:b,defeated=winner===a?b:a;
+      if(Math.abs(w.score)>=77&&defeated.provinces.length>1){
+        const conquered=defeated.provinces.pop();conquered.countryId=winner.id;winner.provinces.push(conquered);
+        event(s,'territory',`${winner.short} annexe ${conquered.name} après la guerre. Sa superficie et sa population changent effectivement.`,[winner.id,defeated.id]);
+      }
+      a.warExhaustion=clamp(a.warExhaustion-.2,0,1);b.warExhaustion=clamp(b.warExhaustion-.2,0,1);
+      event(s,'peace',`Fin de la guerre entre ${a.short} et ${b.short}.`,[a.id,b.id]);
+    }
+  }
+}
+/** Cargo in transit is outside the seller's and buyer's national inventories. */
+function advanceShipments(s){
+  for(const sh of s.shipments){
+    if(sh.status!=='en transit'||s.day<sh.arrive)continue;
+    const buyer=countryById(s,sh.to),seller=countryById(s,sh.from);
+    if(!buyer||!seller){sh.status='annulée';continue;}
+    const perishable=['cereales','poisson','coton'].includes(sh.resource);
+    const lossRate=perishable?Math.min(.30,(sh.arrive-sh.depart)*.0011):Math.min(.018,(sh.arrive-sh.depart)*.00011);
+    sh.loss=rnd(sh.quantity*lossRate,5);sh.delivered=rnd(sh.quantity-sh.loss,5);
+    buyer.stocks[sh.resource]=rnd((buyer.stocks[sh.resource]||0)+sh.delivered,5);
+    sh.status='livrée';sh.deliveredDay=s.day;
+    event(s,'trade',`${buyer.short} reçoit ${sh.delivered} ${sh.resource} de ${seller.short}. Pertes durant le transport : ${sh.loss}.`,[seller.id,buyer.id],{shipmentId:sh.id});
+  }
+}
+/** Migration is an explicit population transfer, never a creation of inhabitants. */
+function migrateMonth(s){
+  const movers=[];
+  for(const origin of s.countries){
+    if(origin.policy.openBorders<=.12)continue;
+    const weightedUnrest=sum(origin.provinces,p=>p.unrest*p.population)/Math.max(1,population(origin));
+    const weightedHunger=sum(origin.provinces,p=>p.hunger*p.population)/Math.max(1,population(origin));
+    const originQuality=(1-origin.unemployment)*.3+origin.stability*.27+(1-weightedHunger)*.20+(1-weightedUnrest)*.13+origin.policy.welfare*.1;
+    const options=s.countries.filter(c=>c.id!==origin.id&&c.policy.openBorders>.12&&
+      !s.wars.some(w=>w.status==='en cours'&&w.participants.includes(origin.id)&&w.participants.includes(c.id)))
+      .map(dest=>{
+        const dUnrest=sum(dest.provinces,p=>p.unrest*p.population)/Math.max(1,population(dest));
+        const quality=(1-dest.unemployment)*.3+dest.stability*.27+(1-sum(dest.provinces,p=>p.hunger*p.population)/Math.max(1,population(dest)))*.20+(1-dUnrest)*.13+dest.policy.welfare*.1;
+        const travelPenalty=origin.continent!==dest.continent?.035:0;
+        return {dest,margin:quality-originQuality-travelPenalty};
+      }).sort((a,b)=>b.margin-a.margin||a.dest.id-b.dest.id);
+    const preferred=options[0];if(!preferred||preferred.margin<.015)continue;
+    const available=Math.max(0,Math.floor(population(origin)*.00018*preferred.margin*10*origin.policy.openBorders*preferred.dest.policy.openBorders));
+    const count=Math.min(1800,available);
+    if(count<1)continue;
+    const src=[...origin.provinces].sort((a,b)=>b.unrest-a.unrest||a.id.localeCompare(b.id))[0];
+    const dst=[...preferred.dest.provinces].sort((a,b)=>b.jobs/Math.max(1,b.population)-a.jobs/Math.max(1,a.population)||a.id.localeCompare(b.id))[0];
+    if(!src||!dst||src.population<count)continue;
+    movers.push({origin,dest:preferred.dest,src,dst,count});
+  }
+  for(const m of movers){
+    // Sequential monthly flows cannot move more people than the origin currently contains.
+    const count=Math.min(m.count,m.src.population);if(!count)continue;
+    m.src.population-=count;m.dst.population+=count;
+    m.origin.migrationNet=(m.origin.migrationNet||0)-count;
+    m.origin.emigrants=(m.origin.emigrants||0)+count;
+    m.dest.migrationNet=(m.dest.migrationNet||0)+count;
+    m.dest.immigrants=(m.dest.immigrants||0)+count;
+    s.migrations.push({id:s.nextMigration++,day:s.day,from:m.origin.id,to:m.dest.id,originProvince:m.src.id,
+      destinationProvince:m.dst.id,count});
+    event(s,'migration',`${count.toLocaleString('fr-FR')} personnes quittent ${m.origin.short} pour ${m.dest.short}.`,[m.origin.id,m.dest.id]);
+  }
+  if(s.migrations.length>1500)s.migrations=s.migrations.slice(-1500);
+}
+function politicsDay(s,c){
+  const dissent=(c.rights.press==='censurée'?.000019:0)+(c.rights.assembly==='restreint'?.000018:0);
+  const institution=(c.rights.judicial==='militaire'?.000008:0);
+  const openness=c.rights.press==='libre'&&c.rights.assembly==='autorisé'?.000012:0;
+  for(const p of c.provinces)p.unrest=clamp(rnd(p.unrest+dissent+institution-openness,6),0,1);
+  c.legitimacy=clamp(rnd(c.legitimacy-(dissent+institution)*.35+openness*.2,6),0,1);
+  c.approval=clamp(rnd(c.approval-dissent*.32+openness*.21,6),0,1);
+}
+function expireProposals(s){for(const p of s.proposals)if(p.status==='en attente'&&s.day>=p.expires){p.status='expirée';event(s,'diplomacy',`Proposition n°${p.id} expirée.`,[p.from,p.to]);}}
+function localAgentChoice(s,a){
+  const c=countryById(s,a.countryId);
+  const needs=c.stocks.cereales<population(c)*.022/1000;
+  const incoming=c.messages.filter(m=>m.to===c.id&&!m.outgoing).at(-1);
+  if(incoming&&incoming.day>(a.lastInboxDay??-1)){a.lastInboxDay=incoming.day;
+    return {type:'message',payload:{target:incoming.from,text:`Votre dépêche a été reçue par la chancellerie de ${c.short}. Nous examinerons ses conséquences pour nos intérêts.`},reason:'Réponse indépendante à une dépêche reçue'};
+  }
+  const open=s.proposals.find(p=>p.to===c.id&&p.status==='en attente');
+  if(open){
+    const favorable=open.kind==='paix'||open.kind==='non_agression'||open.kind==='commerce'||
+      (open.kind==='trade'&&c.treasury>open.price*1.8 && open.quantity>0)||
+      (open.kind==='loan'&&c.treasury<1200)||
+      (open.kind==='alliance'&&c.relations[open.from]>.1);
+    return {type:'respond',payload:{proposalId:open.id,accept:favorable},reason:'Évaluation privée d’une proposition reçue'};
+  }
+  const war=s.wars.find(w=>w.status==='en cours'&&w.participants.includes(c.id));
+  if(war&&c.warExhaustion>.3)return {type:'peace',payload:{target:war.participants.find(x=>x!==c.id)},reason:'Faire cesser une guerre coûteuse'};
+  if(needs&&c.treasury>175)return {type:'project',payload:{project:'fermes',provinceId:c.provinces[0].id},reason:'Renforcer les ressources alimentaires'};
+  const hostile=s.countries.filter(z=>z.id!==c.id&&c.relations[z.id]<-.24&&z.continent===c.continent);
+  if(!war&&hostile.length&&a.risk>.54&&c.soldiers>13000&&c.militaryReadiness>.52&&random(s)<.16){
+    const enemy=hostile[Math.floor(random(s)*hostile.length)];
+    return {type:'declare_war',payload:{target:enemy.id},reason:`Rivalité territoriale contre ${enemy.short}`};
+  }
+  if(c.soldiers<11000&&c.treasury>350&&a.risk>.58&&random(s)<.25)return {type:'recruit',payload:{count:1800},reason:'Renforcement préventif de l’armée'};
+  if(c.treasury>750&&random(s)<.43){
+    const options=['routes','ecoles','hopital','ateliers','mines','eau'];
+    const project=options[Math.floor(random(s)*options.length)];
+    const prov=c.provinces[Math.floor(random(s)*c.provinces.length)];
+    return {type:'project',payload:{project,provinceId:prov.id},reason:`Priorité nationale : ${a.objective}`};
+  }
+  if(c.treasury>1500&&!c.tech.known.includes('geologie')&&!c.tech.progress.some(r=>r.technology==='geologie')&&random(s)<.45)
+    return {type:'research',payload:{technology:'geologie'},reason:'Modernisation des connaissances'};
+  if(c.stability<.45&&c.treasury>50)return {type:'relief',payload:{amount:50},reason:'Apaiser les tensions sociales'};
+  if(c.taxRate>.23&&random(s)<.3)return {type:'policy',payload:{field:'taxRate',value:rnd(c.taxRate-.012,3)},reason:'Fiscalité considérée trop lourde'};
+  const other=s.countries.filter(z=>z.id!==c.id).sort((x,y)=>c.relations[y.id]-c.relations[x.id])[0];
+  if(other&&c.relations[other.id]>.18&&random(s)<.45)return {type:'propose',payload:{target:other.id,kind:random(s)<.35?'alliance':'commerce'},reason:'Accroître la coopération bilatérale'};
+  if(other&&c.stocks.cereales>population(c)*.09/1000&&random(s)<.25)
+    return {type:'trade',payload:{target:other.id,resource:'cereales',quantity:Math.min(9,rnd(c.stocks.cereales*.03,3)),price:14},reason:'Exportation de produits agricoles'};
+  if(other&&c.treasury>2200&&random(s)<.2)return {type:'gift',payload:{target:other.id,amount:30},reason:'Influence et aide extérieure'};
+  return {type:'message',payload:{target:other?.id??s.playerId,text:`${c.short} sollicite une nouvelle rencontre avec la délégation de ${other?.short||'Astérie'}.`},reason:'Correspondance diplomatique'};
+}
+function scheduleLocalAgents(s){
+  if(s.mode!=='local')return;
+  for(const a of s.agents){
+    if(s.day<a.nextDecisionDay)continue;
+    const move=localAgentChoice(s,a);
+    if(move){command(s,a.countryId,move.type,move.payload);a.lastDecisionDay=s.day;a.lastSource='contrôleur local (règles)';
+      a.privateMemory.push({day:s.day,reason:move.reason,action:move.type});a.privateMemory=a.privateMemory.slice(-60);}
+    a.nextDecisionDay=s.day+25+Math.floor(random(s)*18);
+  }
+}
+function agentView(s,countryId){
+  const c=countryById(s,countryId),a=s.agents.find(z=>z.countryId===c.id);
+  if(!a)throw Error('Pas d’agent pour ce pays');
+  const knownNeighbors=s.countries.filter(n=>n.id!==c.id).map(n=>({id:n.id,name:n.name,continent:n.continent,
+    relation:c.relations[n.id],approxPopulation:Math.round(population(n)/100000)*100000,
+    approxMilitary:n.soldiers===0?0:Math.round(n.soldiers*(.8+.4*((n.id+1)%3)/2)/1000)*1000,
+    confidence:'estimation imparfaite'}));
+  return {countryId:c.id,day:s.day,date:dateString(s.day),leader:c.leader,personality:a.persona,goal:a.objective,
+    self:{...nationalStats(c),treasury:c.treasury,stockGrain:c.stocks.cereales,resourcesOwned:RESOURCES.filter(r=>c.reserves[r.id]>0).map(r=>({id:r.id,stock:c.stocks[r.id],knownReserve:c.reserves[r.id]})),
+      laws:c.rights,activeProjects:s.projects.filter(pr=>pr.owner===c.id&&pr.status==='chantier').map(pr=>({label:pr.label,finish:pr.finish})),
+      provinces:c.provinces.map(p=>({id:p.id,name:p.name,
+      population:p.population,roads:p.roads,farms:p.farms,health:p.health,unrest:p.unrest})),tech:c.tech.known},
+    publicNeighbors:knownNeighbors,incoming:s.proposals.filter(p=>p.to===c.id&&p.status==='en attente'),
+    receivedMessages:c.messages.filter(m=>m.to===c.id).slice(-8),
+    wars:s.wars.filter(w=>w.status==='en cours'&&w.participants.includes(c.id)),
+    recentEvents:s.events.filter(e=>e.actors.includes(c.id)||e.actors.length===11).slice(-12),
+    privateMemory:a.privateMemory.slice(-20),allowedActions:['policy','law','budget','project','research','recruit','demobilize','relief','explore','extract','message','gift','propose','respond','declare_war','peace','loan','trade','spy']};
+}
+function applyAgentDecision(s,countryId,choice){
+  const a=s.agents.find(z=>z.countryId===Number(countryId));if(!a)throw Error('Agent introuvable');
+  if(!choice||!ACTION_TYPES.includes(choice.type)||typeof choice.payload!=='object'||!choice.payload||Array.isArray(choice.payload))throw Error('Action IA non valide');
+  command(s,a.countryId,choice.type,choice.payload);
+  a.lastDecisionDay=s.day;a.nextDecisionDay=s.day+30;a.lastSource='Gemini (API externe)';
+  a.privateMemory.push({day:s.day,reason:String(choice.reason||'Décision autonome').slice(0,250),action:choice.type});a.privateMemory=a.privateMemory.slice(-60);
+}
+function tick(s,days=1){
+  if(!Number.isInteger(days)||days<1||days>366)throw Error('Avancement : de 1 à 366 jours');
+  for(let i=0;i<days;i++){
+    s.day++;
+    applyOrders(s);
+    for(const c of s.countries){publicSectorDay(s,c);societyDay(s,c);politicsDay(s,c);}
+    advanceProjects(s);advanceShipments(s);resolveWars(s);expireProposals(s);
+    if(s.day%30===0)migrateMonth(s);
+    scheduleLocalAgents(s);
+    if(s.day%30===0)event(s,'chronicle',`Bilan du mois établi : ressources, activité, population, diplomatie et trésoreries actualisées.`,[]);
+    if(s.day%365===0)yearlySuccession(s);
+    if(s.day%30===0)verifyWorld(s);
+  }
+  return s;
+}
+function restoreWorld(value){
+  const s=typeof value==='string'?JSON.parse(value):value;
+  if(!s||s.schema!==3||s.worldId!=='MD-11-3C-1800')throw Error('Sauvegarde incompatible');
+  s.shipments??=[];s.migrations??=[];s.nextShipment??=s.shipments.length+1;s.nextMigration??=s.migrations.length+1;
+  for(const c of s.countries){if(!c.marketPrices)c.marketPrices={cereales:1,bois:1.2,pierre:1.1,fer:1.7,petrole:4.5};
+    c.migrationNet??=0;c.immigrants??=0;c.emigrants??=0;}
+  s.version='1.1.0';
+  verifyWorld(s);return s;
+}
+const allResources=[...RESOURCES,...COMMON];
+const WORLD_CONFIG={NATIONS,CONTINENTS,RESOURCES,COMMON,PROJECTS,TECHNOLOGIES,ACTION_TYPES};
+
+
+const KEY='world-dynasty-causal-v1-save';
+
+const views=[['overview','◈','Vue générale'],['world','◉','Carte du monde'],['nations','♜','États & politique'],['resources','◆','Ressources'],['economy','¤','Économie'],['population','♧','Population'],['commerce','⇄','Commerce'],['diplomacy','✉','Diplomatie'],['military','⚔','Armées & guerres'],['science','✧','Recherche'],['agents','☷','Dirigeants IA'],['chronicle','≡','Chroniques'],['settings','⚙','Sauvegardes'],['menu','☷','Tous les écrans']];
+let s;
+try{s=restoreWorld(JSON.parse(localStorage.getItem(KEY)));}catch{s=createWorld();}
+let currentView='overview', selectedNation=10, selectedProvince=null, continentFilter='all', mapLayer='politique', runSpeed=0;
+let modal=null, notice='', noticeTimer=null, server={geminiConfigured:false,model:null}, activeAgent=false, lastAgentCall=0, agentError='', renderCount=0;
+const app=document.querySelector('#app');
+const nfmt=new Intl.NumberFormat('fr-FR');
+const fmt=(n,d=0)=>Number.isFinite(Number(n))?new Intl.NumberFormat('fr-FR',{maximumFractionDigits:d,minimumFractionDigits:d}).format(n):'—';
+const money=n=>`${fmt(n,2)} M Cr`;
+const pc=n=>`${fmt(Number(n)*100,1)} %`;
+const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const attr=esc;
+const player=()=>playerNation(s);
+const country=id=>s.countries.find(c=>c.id===Number(id));
+const prov=id=>s.countries.flatMap(c=>c.provinces).find(p=>p.id===id);
+const humanDate=()=>dateString(s.day);
+const smStat=(label,value,hint='')=>`<div class="stat"><div class="k">${esc(label)}</div><div class="v">${esc(value)}</div><div class="hint">${esc(hint)}</div></div>`;
+const panel=(title,inner,sub='',actions='')=>`<section class="panel"><header class="panel-head"><div><h3>${title}</h3>${sub?`<div class="panel-sub">${sub}</div>`:''}</div>${actions}</header>${inner}</section>`;
+const details=(items)=>`<div class="detail-grid">${items.map(([k,v,h])=>`<div class="detail"><div class="label">${esc(k)}</div><div class="value">${esc(v)}</div>${h?`<div class="tiny muted">${esc(h)}</div>`:''}</div>`).join('')}</div>`;
+const btn=(label,action,cls='ghost',extra='')=>`<button class="btn ${cls}" data-action="${attr(action)}" ${extra}>${label}</button>`;
+const name=id=>country(id)?.short||'Pays inconnu';
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(s));return true;}catch(e){message('Sauvegarde locale pleine. Exporter le fichier de partie.');return false;}};
+function message(t){notice=String(t);clearTimeout(noticeTimer);noticeTimer=setTimeout(()=>{notice='';render();},4300);render();}
+const ownStats=()=>nationalStats(player());
+const activeProposals=()=>s.proposals.filter(p=>p.status==='en attente');
+function flag(c){return `<span class="flag" style="background:${esc(c.color)}"></span>`;}
+const rowLine=(title,val)=>`<div class="meta-line"><span>${title}</span><strong>${val}</strong></div>`;
+function economyKPIs(c){const x=nationalStats(c);return [smStat('Trésorerie',money(x.treasury),'Réserve immédiatement utilisable'),smStat('PIB annuel',money(x.gdpAnnual),'Estimation de production'),smStat('Dette publique',money(x.debt),'Principal hors intérêts'),smStat('Population',fmt(x.population),`${fmt(x.areaKm2)} km² de territoire`) ].join('');}
+function rankings(sortBy='gdpAnnual'){
+ const sorted=[...s.countries].sort((a,b)=>{const av=sortBy==='population'?nationalStats(a).population:sortBy==='treasury'?a.treasury:sortBy==='areaKm2'?nationalStats(a).areaKm2:a.gdpAnnual;const bv=sortBy==='population'?nationalStats(b).population:sortBy==='treasury'?b.treasury:sortBy==='areaKm2'?nationalStats(b).areaKm2:b.gdpAnnual;return bv-av;});
+ return `<div class="table-wrap"><table class="data-table"><thead><tr><th>#</th><th>État</th><th>Continent</th><th class="num">Habitants</th><th class="num">Superficie km²</th><th class="num">PIB (M Cr)</th><th class="num">Trésor</th></tr></thead><tbody>${sorted.map((c,i)=>`<tr class="clickable" data-country="${c.id}"><td>${i+1}</td><td>${flag(c)} ${esc(c.short)} ${c.id===s.playerId?'<span class="tint">(vous)</span>':''}</td><td>${esc(CONTINENTS[c.continent].name)}</td><td class="num">${fmt(nationalStats(c).population)}</td><td class="num">${fmt(nationalStats(c).areaKm2)}</td><td class="num">${fmt(c.gdpAnnual,1)}</td><td class="num">${fmt(c.treasury,1)}</td></tr>`).join('')}</tbody></table></div>`;
+}
+function mapMarkup(){
+ const visible=continentFilter==='all'?s.countries:s.countries.filter(c=>c.continent===Number(continentFilter));
+ const viewbox=continentFilter==='all'?'0 0 1200 690':CONTINENTS[Number(continentFilter)].viewBox;
+ const label=CONTINENTS.map((c,i)=>{const pos=[[294,75],[918,78],[608,408]][i];return `<text class="continent-label" x="${pos[0]}" y="${pos[1]}" text-anchor="middle">${c.name.toUpperCase()}</text>`;}).join('');
+ const cells=visible.flatMap(c=>c.provinces.map(p=>{
+  const pts=p.polygon.map(q=>q.join(',')).join(' ');
+  let fill=c.color;
+  if(mapLayer==='population'){const value=p.population/Math.max(1,p.areaKm2),a=Math.min(80,Math.max(14,Math.round(value*3)));fill=`hsl(31 64% ${a}%)`;}
+  if(mapLayer==='stabilite'){fill=`hsl(${Math.round((1-p.unrest)*125)} 43% 40%)`;}
+  if(mapLayer==='agriculture'){fill=`hsl(105 45% ${Math.round(20+p.fertility*50)}%)`;}
+  return `<polygon class="province ${c.id===10?'player':''} ${selectedProvince===p.id?'selected':''}" points="${pts}" fill="${fill}" data-province="${attr(p.id)}"><title>${esc(p.name)} — ${fmt(p.population)} hab.</title></polygon>`;
+ })).join('');
+ const capitals=visible.map(c=>{const q=c.corners;const x=q.reduce((a,p)=>a+p[0],0)/4,y=q.reduce((a,p)=>a+p[1],0)/4;return `<circle class="map-city" cx="${x}" cy="${y}" r="3.5"/><text class="nation-label" x="${x}" y="${y-12}" text-anchor="middle" style="font-size:12px">${esc(c.short)}</text>`;}).join('');
+ return `<div class="map-controls">${[['all','Les 3 continents'],...CONTINENTS.map(c=>[String(c.id),c.name])].map(([id,t])=>`<button data-continent="${id}" class="${String(continentFilter)===id?'active':''}">${t}</button>`).join('')}</div><div class="map-controls layerline">${[['politique','Politique'],['population','Densité'],['stabilite','Tensions'],['agriculture','Fertilité']].map(([id,t])=>`<button data-layer="${id}" class="${mapLayer===id?'active':''}">${t}</button>`).join('')}</div><div class="map-container"><svg viewBox="${viewbox}" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Carte interactive des trois continents et des onze pays"><rect x="0" y="0" width="1200" height="690" fill="#102f41"/><path class="landmass" d="M67 99 Q143 54 261 74 L503 101 L505 267 L481 369 L280 372 L87 366 L63 241 Z"/><path class="landmass" d="M699 96 Q798 53 918 77 L1120 96 L1131 251 L1111 363 L707 368 L686 261 Z"/><path class="landmass" d="M360 409 L889 403 L894 597 L859 643 L369 638 L348 513 Z"/><text class="ocean-label" x="589" y="221" text-anchor="middle">OCÉAN</text>${label}${cells}${capitals}</svg></div><div class="map-legend"><span>◆ Astérie : votre nation</span><span>Appuyez sur une province pour l’inspecter.</span><span>Carte fictive originale, pas une carte terrestre réelle</span></div>`;
+}
+function profile(c){const x=nationalStats(c);return `<div class="ruler"><div class="ruler-badge"><div class="ruler-icon">♛</div><div><div class="ruler-name">${esc(c.leader)}</div><div class="ruler-small">${esc(c.regime)} · ${esc(c.capital)}</div><div class="ruler-small">${esc(c.short)} · ${esc(CONTINENTS[c.continent].name)}</div></div></div>${rowLine('Population',fmt(x.population))}${rowLine('Superficie',`${fmt(x.areaKm2)} km²`)}${rowLine('Trésorerie',money(c.treasury))}${rowLine('Forces armées',fmt(c.soldiers))}${rowLine('Stabilité',pc(c.stability))}${rowLine('Légitimité',pc(c.legitimacy))}${rowLine('Impôts',pc(c.taxRate))}${rowLine('Solde migratoire',`${(c.migrationNet||0)>=0?'+':''}${fmt(c.migrationNet||0)}`)}<div style="margin-top:14px" class="btnrow">${c.id===10?btn('Donner un ordre','orders','primary'):btn('Relations diplomatiques','open-diplomacy','ghost')}</div></div>`;}
+function provinceDetail(p){const c=country(p.countryId);return `<div class="ruler"><div class="ruler-badge"><div class="ruler-icon">⌖</div><div><div class="ruler-name">${esc(p.name)}</div><div class="ruler-small">${esc(c.short)} · ${esc(p.terrain)}</div></div></div>${rowLine('Habitants',fmt(p.population))}${rowLine('Superficie',`${fmt(p.areaKm2)} km²`)}${rowLine('Fertilité',pc(p.fertility))}${rowLine('Routes',pc(p.roads))}${rowLine('Santé',pc(p.health))}${rowLine('Scolarisation',pc(p.education))}${rowLine('Mécontentement',pc(p.unrest))}${rowLine('Bâtiments achevés',fmt(p.buildings.length))}${p.countryId===10?btn('Aménager cette province','orders','primary wide'):btn('Consulter le pays','view-country','ghost wide')}</div>`;}
+function logs(max=7,types=[]){const array=s.events.filter(e=>!types.length||types.includes(e.kind)).slice(-max).reverse();return `<div class="chronicle">${array.length?array.map(e=>`<div class="logrow"><time>J${e.day} · ${esc(e.date)} · ${esc(e.kind)}</time><p>${esc(e.text)}</p></div>`).join(''):'<p class="empty">Aucun événement enregistré.</p>'}</div>`;}
+function overview(){const c=player(),x=nationalStats(c),dom=resourceDominance(s);return `<div class="content-stack"><div class="intro-row"><div><div class="eyebrow">Tableau de bord souverain</div><h2>${esc(c.name)}</h2><p>11 nations · 3 continents · année ${1800+Math.floor(s.day/365)} · univers fictif</p></div><span class="tag"><i class="dot ${runSpeed?'':'off'}"></i> ${runSpeed?'Simulation active':'Simulation en pause'}</span></div><div class="stats-grid">${economyKPIs(c)}</div><div class="mid-layout"><div class="panel"><div class="panel-head"><div><h3>Carte géopolitique</h3><div class="panel-sub">44 provinces initiales · frontières modifiables par les guerres</div></div>${btn('Carte complète','world','small')}</div>${mapMarkup()}</div><div class="region-right">${panel('Le souverain',selectedProvince&&prov(selectedProvince)?provinceDetail(prov(selectedProvince)):profile(country(selectedNation)))}${panel('Le rapport stratégique',`<div class="section-pad"><div class="callout">Astérie possède les ${RESOURCES.length} catégories de ressources stratégiques. À la fondation, chacune dispose d’au moins 100× la réserve du deuxième détenteur. Ce ratio n’est pas maintenu artificiellement après exploitation ou échanges.</div>${rowLine('Ressources dominantes',`${dom.filter(r=>r.second>0&&r.ratio>=100).length} / ${dom.length}`)}${rowLine('Pays pétroliers',fmt(dom.find(r=>r.id==='petrole').countriesWithDeposit))}${rowLine('Projets en cours',fmt(s.projects.filter(p=>p.status==='chantier'&&p.owner===10).length))}${rowLine('Propositions reçues',fmt(activeProposals().filter(p=>p.to===10).length))}</div>`)}</div></div><div class="content-grid">${panel('Chroniques récentes',logs(5),'Conséquences enregistrées dans le moteur',btn('Toutes les chroniques','chronicle','small'))}${panel('Classement économique',rankings(),'Tous les pays sont soumis aux mêmes calculs',btn('Comparer les États','nations','small'))}</div></div>`;}
+function world(){return `<div class="content-stack"><div class="view-title"><div><div class="eyebrow">Géographie</div><h2>Trois continents séparés</h2><p>Un seul monde · 11 souverainetés · 44 provinces au lancement</p></div></div><div class="mid-layout"><div class="panel"><div class="panel-head"><h3>Atlas politique</h3></div>${mapMarkup()}</div>${panel(selectedProvince?'Province sélectionnée':'État sélectionné',selectedProvince&&prov(selectedProvince)?provinceDetail(prov(selectedProvince)):profile(country(selectedNation)))}</div>${panel('Atlas des continents',`<div class="cards-grid section-pad">${CONTINENTS.map(x=>`<article class="mini-card"><h4>${esc(x.name)}</h4><p>${esc(x.subtitle)}</p><strong>${s.countries.filter(c=>c.continent===x.id).length} États</strong><p>${fmt(s.countries.filter(c=>c.continent===x.id).reduce((a,c)=>a+nationalStats(c).areaKm2,0))} km²</p><button class="btn small" data-continent="${x.id}" data-action="world">Explorer</button></article>`).join('')}</div>`)}</div>`;}
+function nations(){const c=country(selectedNation),x=nationalStats(c);return `<div class="content-stack"><div class="view-title"><div><div class="eyebrow">États & politique</div><h2>Les onze souverainetés</h2><p>Pas de protection spéciale pour Astérie · seuls les 10 rivaux disposent de contrôleurs IA</p></div></div>${panel('Classement des pays',rankings())}<div class="content-grid">${panel(`Dossier national : ${esc(c.short)}`,`<div class="section-pad">${details([['Régime',c.regime],['Chef de l’État',c.leader],['Population',fmt(x.population)],['Superficie',`${fmt(x.areaKm2)} km²`],['Alphabétisation',pc(c.literacy)],['Chômage',pc(c.unemployment)],['Légitimité',pc(c.legitimacy)],['Stabilité',pc(c.stability)],['Corruption',pc(c.corruption)],['Solde migratoire',`${(c.migrationNet||0)>=0?'+':''}${fmt(c.migrationNet||0)}`]])}<div class="separator"></div>${rowLine('Fiscalité',pc(c.taxRate))}${rowLine('Expression publique',esc(c.rights.press))}${rowLine('Droit de réunion',esc(c.rights.assembly))}${rowLine('Conscription',esc(c.rights.conscription))}${rowLine('Successions',esc(c.succession))}</div>`, 'Choisir une nation dans le classement')}${panel('Provinces contrôlées',`<div class="table-wrap"><table class="data-table"><thead><tr><th>Province</th><th class="num">Habitants</th><th class="num">km²</th><th class="num">Santé</th></tr></thead><tbody>${c.provinces.map(p=>`<tr class="clickable" data-province="${attr(p.id)}"><td>${esc(p.name)}</td><td class="num">${fmt(p.population)}</td><td class="num">${fmt(p.areaKm2)}</td><td class="num">${pc(p.health)}</td></tr>`).join('')}</tbody></table></div>`)}</div></div>`;}
+function resources(){const d=resourceDominance(s),c=country(selectedNation);return `<div class="content-stack"><div class="view-title"><div><div class="eyebrow">Géologie et matières premières</div><h2>18 ressources stratégiques</h2><p>Réserves dans le sol distinctes des stocks disponibles et des capacités techniques</p></div></div>${panel('Réserves géologiques et domination initiale',`<div class="table-wrap"><table class="data-table"><thead><tr><th>Ressource</th><th class="num">Astérie</th><th class="num">2e détenteur</th><th class="num">Rapport actuel</th><th class="num">Pays détenteurs</th></tr></thead><tbody>${d.map(r=>`<tr><td>${esc(r.name)} <span class="tiny muted">(${esc(r.unit)})</span></td><td class="num tint">${fmt(r.player,2)}</td><td class="num">${fmt(r.second,2)} ${r.secondCountry!==null?`<span class="muted tiny">${esc(name(r.secondCountry))}</span>`:''}</td><td class="num ${r.ratio>=100?'up':'warning'}">${r.ratio===null?'—':`${fmt(r.ratio,1)}×`}</td><td class="num">${r.countriesWithDeposit}/11</td></tr>`).join('')}</tbody></table></div>`, 'Ratio garanti au lancement, susceptible d’évoluer par extraction et conquête')}<div class="content-grid">${panel(`Inventaire : ${esc(c.short)}`,`<div class="table-wrap"><table class="data-table"><thead><tr><th>Ressource</th><th class="num">Réserve</th><th class="num">Stock extrait</th></tr></thead><tbody>${[...RESOURCES,...COMMON].map(r=>`<tr><td>${esc(r.name)}</td><td class="num">${fmt(c.reserves[r.id]||0,2)}</td><td class="num">${fmt(c.stocks[r.id]||0,3)}</td></tr>`).join('')}</tbody></table></div>`)}${panel('Exploitation minière',`<div class="section-pad"><p class="doc-note">Posséder une ressource ne signifie pas savoir l’extraire, la raffiner ou la commercialiser. Les techniques, le financement et la capacité d’exploitation doivent être disponibles.</p><div class="callout">Exemple : seuls Astérie et Mazir détiennent des gisements de pétrole au départ. Les neuf autres pays n’en ont pas.</div><div style="margin-top:13px">${btn('Lancer une prospection','orders','primary wide')}</div></div>`)}</div></div>`;}
+function economy(){const c=player(),x=nationalStats(c);return `<div class="content-stack"><div class="view-title"><div><div class="eyebrow">Ministère des finances</div><h2>Comptes publics et économie</h2><p>Unité monétaire : millions de couronnes (M Cr) · ordres de grandeur fictifs</p></div></div><div class="stats-grid">${economyKPIs(c)}</div><div class="content-grid">${panel('Budget et recettes',`<div class="section-pad">${rowLine('Impôt national',pc(c.taxRate))}${rowLine('Recettes du dernier jour',money(c.cashFlow.tax))}${rowLine('Services publics',money(c.cashFlow.spending))}${rowLine('Dépenses militaires',money(c.cashFlow.army))}${rowLine('Intérêts payés',money(c.cashFlow.interest))}${rowLine('Commerce extérieur (solde)',money(c.tradeBalance))}${rowLine('Patrimoine privé estimé',money(c.privateWealth))}${rowLine('Immigration totale',fmt(c.immigrants||0))}${rowLine('Émigration totale',fmt(c.emigrants||0))}${rowLine('Cargaisons en route',fmt(s.shipments.filter(sh=>sh.status==='en transit'&&(sh.from===10||sh.to===10)).length))}<div class="separator"></div>${Object.entries(c.budget).map(([k,v])=>`<div class="meta-line"><span>${esc(k)}</span><strong>${pc(v)}</strong></div><div class="meter"><span style="width:${Math.round(v*100)}%"></span></div>`).join('')}</div>`, 'Les dépenses effectivement réalisées figurent dans le journal comptable')}${panel('Grand livre · mouvements récents',`<div class="table-wrap"><table class="data-table"><thead><tr><th>Jour</th><th>Opération</th><th class="num">Montant</th></tr></thead><tbody>${s.ledger.filter(x=>x.from.startsWith('10:')||x.to.startsWith('10:')).slice(-28).reverse().map(x=>`<tr><td>J${x.day}</td><td>${esc(x.reason)}</td><td class="num">${money(x.amount)}</td></tr>`).join('')||'<tr><td colspan="3">Aucune opération enregistrée</td></tr>'}</tbody></table></div>`, 'Journal des transferts entre comptes')}
+</div>${panel('Situation des investissements',`<div class="section-pad cards-grid">${s.projects.filter(p=>p.owner===10).slice(-10).reverse().map(p=>`<div class="mini-card"><h4>${esc(p.label)}</h4><p>${esc(prov(p.provinceId)?.name||'Province inconnue')}</p><strong>${esc(p.status)}</strong> <span class="muted tiny">· J${p.finish}</span><div class="meter"><span style="width:${Math.round(p.progress*100)}%"></span></div></div>`).join('')||'<div class="empty">Aucun chantier commencé. Vous pouvez en financer un dans le menu Ordres.</div>'}</div>`)}</div>`;}
+function populationScreen(){
+ const c=player(),x=nationalStats(c),movements=s.migrations.filter(m=>m.from===10||m.to===10).slice(-40).reverse();
+ return `<div class="content-stack"><div class="view-title"><div><div class="eyebrow">Démographie vivante</div><h2>Population et migrations</h2><p>Naissances, décès, emplois, conditions de vie et déplacements enregistrés</p></div>${btn('Gérer les frontières','orders','primary')}</div><div class="stats-grid">${smStat('Habitants',fmt(x.population))}${smStat('Immigration cumulée',fmt(c.immigrants||0))}${smStat('Émigration cumulée',fmt(c.emigrants||0))}${smStat('Solde migratoire',`${(c.migrationNet||0)>=0?'+':''}${fmt(c.migrationNet||0)}`)}</div><div class="content-grid">${panel('Conditions sociales',`<div class="section-pad">${rowLine('Taux de chômage estimé',pc(c.unemployment))}${rowLine('Alphabétisation',pc(c.literacy))}${rowLine('Santé globale',pc(c.healthIndex))}${rowLine('Stabilité',pc(c.stability))}${rowLine('Accueil aux frontières',pc(c.policy.openBorders))}${rowLine('Protection sociale',pc(c.policy.welfare))}${rowLine('Liberté de la presse',esc(c.rights.press))}${rowLine('Droit de réunion',esc(c.rights.assembly))}</div>`)}${panel('Flux récents',`<div class="section-pad">${movements.map(m=>`<div class="meta-line"><span>J${m.day} · ${esc(name(m.from))} → ${esc(name(m.to))}</span><strong>${fmt(m.count)} personnes</strong></div>`).join('')||'<p class="empty">Aucune migration internationale enregistrée.</p>'}<p class="doc-note">Les migrations sont examinées à intervalles de 30 jours. Elles déplacent réellement les habitants d’une province à une autre. Elles ne créent pas de population.</p></div>`)}</div>${panel('Population provinciale',`<div class="table-wrap"><table class="data-table"><thead><tr><th>Province</th><th class="num">Population</th><th class="num">Chômage national</th><th class="num">Mécontentement</th></tr></thead><tbody>${c.provinces.map(p=>`<tr data-province="${attr(p.id)}" class="clickable"><td>${esc(p.name)}</td><td class="num">${fmt(p.population)}</td><td class="num">${pc(c.unemployment)}</td><td class="num">${pc(p.unrest)}</td></tr>`).join('')}</tbody></table></div>`)}</div>`;
+}
+function commerce(){
+ const trades=s.shipments.slice(-80).reverse(),c=player(),ours=trades.filter(sh=>sh.from===10||sh.to===10),pending=trades.filter(sh=>sh.status==='en transit');
+ return `<div class="content-stack"><div class="view-title"><div><div class="eyebrow">Transport et marché extérieur</div><h2>Commerce et cargaisons</h2><p>Les marchandises ne se téléportent plus : départ, transport, pertes et réception</p></div>${btn('Proposer une vente','orders','primary')}</div><div class="stats-grid">${smStat('Cargaisons en transit',fmt(pending.length))}${smStat('Expéditions conclues',fmt(trades.length))}${smStat('Balance commerciale',money(c.tradeBalance))}${smStat('Droits de douane',`${fmt(c.tariff,1)} %`)}</div>${panel('Expéditions mondiales',`<div class="table-wrap"><table class="data-table"><thead><tr><th>Route</th><th>Ressource</th><th class="num">Quantité</th><th>Dates</th><th>État</th></tr></thead><tbody>${trades.map(sh=>`<tr><td>${esc(name(sh.from))} → ${esc(name(sh.to))}</td><td>${esc(sh.resource)}</td><td class="num">${fmt(sh.quantity,3)}</td><td>J${sh.depart} → J${sh.arrive}</td><td>${esc(sh.status)}${sh.status==='livrée'?` · pertes ${fmt(sh.loss,3)}`:''}</td></tr>`).join('')||'<tr><td colspan="5">Aucune expédition créée.</td></tr>'}</tbody></table></div>`)}${panel('Expéditions concernant Astérie',`<div class="section-pad">${ours.map(sh=>`<div class="meta-line"><span>${esc(sh.resource)} · ${esc(name(sh.from))} → ${esc(name(sh.to))}</span><strong>${esc(sh.status)}</strong></div>`).join('')||'<p class="empty">Aucun contrat commercial conclu pour Astérie.</p>'}<p class="doc-note">Le vendeur remet son stock au transporteur lorsque le contrat est accepté. Le pays acheteur le reçoit seulement à l’arrivée. Les pertes de transport sont tracées.</p></div>`)}</div>`;
+}
+function menu(){return `<div class="content-stack"><div class="view-title"><div><div class="eyebrow">Navigation</div><h2>Explorer WORLD DYNASTY</h2><p>Tous les tableaux, y compris sur iPhone.</p></div></div><div class="cards-grid">${views.filter(v=>v[0]!=='menu').map(([id,ic,label])=>`<button class="mini-card nav-card" data-view="${id}"><span class="nav-icon">${ic}</span><h4>${esc(label)}</h4><p>Ouvrir cet écran</p></button>`).join('')}</div></div>`;}
+function diplomacy(){const c=player(),received=activeProposals().filter(p=>p.to===10),out=activeProposals().filter(p=>p.from===10);return `<div class="content-stack"><div class="view-title"><div><div class="eyebrow">Chancellerie</div><h2>Relations et traités</h2><p>Les États étrangers peuvent négocier entre eux, indépendamment de votre nation</p></div>${btn('Envoyer un ordre diplomatique','orders','primary')}</div>${panel('Relations bilatérales',`<div class="table-wrap"><table class="data-table"><thead><tr><th>Partenaire</th><th>Dirigeant</th><th class="num">Relation</th><th>Continent</th></tr></thead><tbody>${s.countries.filter(z=>z.id!==10).sort((a,b)=>c.relations[b.id]-c.relations[a.id]).map(x=>`<tr class="clickable" data-country="${x.id}"><td>${flag(x)} ${esc(x.short)}</td><td>${esc(x.leader)}</td><td class="num ${c.relations[x.id]>=0?'up':'down'}">${fmt(c.relations[x.id],2)}</td><td>${esc(CONTINENTS[x.continent].name)}</td></tr>`).join('')}</tbody></table></div>`)}<div class="content-grid">${panel('Propositions reçues',`<div class="section-pad">${received.length?received.map(p=>`<div class="mini-card"><h4>${esc(name(p.from))} · ${esc(p.kind)}</h4><p>Proposition n°${p.id} · reçue J${p.day} · expiration J${p.expires}</p><div class="btnrow"><button class="btn small primary" data-respond="${p.id}" data-accept="true">Accepter</button><button class="btn small danger" data-respond="${p.id}" data-accept="false">Refuser</button></div></div>`).join(''):'<p class="empty">Aucune proposition en attente.</p>'}</div>`)}${panel('Traités et correspondances',`<div class="section-pad">${s.treaties.filter(t=>t.members.includes(10)).slice(-15).map(t=>`<div class="meta-line"><span>${esc(t.kind)} avec ${esc(name(t.members.find(id=>id!==10)))}</span><strong>Depuis J${t.signed}</strong></div>`).join('')||'<p class="empty">Aucun traité conclu.</p>'}${out.map(p=>`<div class="meta-line"><span>Proposition ${esc(p.kind)} à ${esc(name(p.to))}</span><strong>En attente</strong></div>`).join('')}</div>`)}</div></div>`;}
+function military(){const c=player();return `<div class="content-stack"><div class="view-title"><div><div class="eyebrow">Commandement général</div><h2>Forces et conflits</h2><p>Batailles calculées, pertes humaines, épuisement et changements territoriaux enregistrés</p></div>${btn('Ordre militaire','orders','primary')}</div><div class="stats-grid">${smStat('Soldats mobilisés',fmt(c.soldiers))}${smStat('Préparation',pc(c.militaryReadiness))}${smStat('Équipement',pc(c.militaryEquipment))}${smStat('Fatigue de guerre',pc(c.warExhaustion))}</div>${panel('Rapport des armées',`<div class="table-wrap"><table class="data-table"><thead><tr><th>Pays</th><th class="num">Effectifs</th><th class="num">Préparation</th><th class="num">Flotte</th><th class="num">Guerre</th></tr></thead><tbody>${[...s.countries].sort((a,b)=>b.soldiers-a.soldiers).map(x=>`<tr data-country="${x.id}" class="clickable"><td>${flag(x)} ${esc(x.short)}</td><td class="num">${fmt(x.soldiers)}</td><td class="num">${pc(x.militaryReadiness)}</td><td class="num">${pc(x.navy)}</td><td class="num">${s.wars.filter(w=>w.status==='en cours'&&w.participants.includes(x.id)).length}</td></tr>`).join('')}</tbody></table></div>`)}${panel('Conflits recensés',`<div class="section-pad">${s.wars.length?s.wars.slice().reverse().map(w=>`<div class="mini-card"><h4>${esc(name(w.attacker))} contre ${esc(name(w.defender))}</h4><p>Début J${w.started} · ${esc(w.status)} · ${w.battles.length} batailles</p><strong>Score : ${fmt(w.score)}</strong><p>Pertes : ${fmt(Object.values(w.casualties).reduce((a,b)=>a+b,0))} soldats</p></div>`).join(''):'<p class="empty">Aucune guerre déclarée.</p>'}</div>`, 'La carte change effectivement lors d’une annexion')}
+</div>`;}
+function science(){const c=player();return `<div class="content-stack"><div class="view-title"><div><div class="eyebrow">Académie des sciences</div><h2>Progrès et innovations</h2><p>La connaissance scientifique est distincte de la possession de matières premières</p></div>${btn('Financer la recherche','orders','primary')}</div>${panel('Technologies',`<div class="cards-grid section-pad">${Object.entries(TECHNOLOGIES).map(([id,t])=>{const status=c.tech.known.includes(id)?'Maîtrisée':c.tech.progress.find(x=>x.technology===id)?'En recherche':`Disponible à partir de ${t.unlock}`;return `<div class="mini-card"><h4>${esc(t.label)}</h4><p>${esc(status)}</p><strong>${money(t.cost)}</strong><p>${t.duration} jours de recherche</p><button class="btn small" data-research="${id}" ${c.tech.known.includes(id)||c.tech.progress.some(x=>x.technology===id)?'disabled':''}>Financer</button></div>`;}).join('')}</div>`)}${panel('Compétences préindustrielles',`<div class="section-pad">${Object.entries(c.tech.levels).map(([k,v])=>rowLine(esc(k),`Niveau ${fmt(v)}`)).join('')}</div>`)}</div>`;}
+function agents(){return `<div class="content-stack"><div class="view-title"><div><div class="eyebrow">Conseil des nations</div><h2>Dix dirigeants étrangers</h2><p>10 profils et mémoires séparés · une nation humaine · aucune préférence codée pour le joueur</p></div></div>${panel('Type de contrôleur',`<div class="section-pad"><div class="callout"><strong>${s.mode==='gemini'?'Mode Gemini':'Mode de démonstration locale'}</strong><p>Le mode local utilise des règles automatisées, pas de véritables IA. Gemini nécessite une clé API configurée sur le serveur et des quotas disponibles. Les requêtes sont exécutées à tour de rôle pendant que le jeu est ouvert.</p></div><div class="btnrow" style="margin-top:12px">${btn('Utiliser les règles locales','set-local',s.mode==='local'?'primary':'ghost')}${btn('Activer Gemini','set-gemini',s.mode==='gemini'?'primary':'ghost',!server.geminiConfigured?'disabled title="Configurer GEMINI_API_KEY sur le serveur"':'')}</div>${server.geminiConfigured?`<p class="doc-note">Serveur connecté au modèle ${esc(server.model)}. Les requêtes peuvent être limitées ou facturées selon votre compte Google.</p>`:server.geminiAvailable?`<p class="doc-note">Gemini est configuré sur le serveur, mais protégé par un code. ${btn('Déverrouiller les agents','unlock-gemini','primary')}</p>`:'<p class="doc-note">Gemini n’est pas configuré. Les dirigeants utilisent temporairement les règles locales.</p>'}${agentError?`<p class="warning">Dernier problème : ${esc(agentError)}</p>`:''}</div>`)}${panel('Profils autonomes',`<div class="section-pad">${s.agents.map(a=>{const c=country(a.countryId);return `<div class="sim-agent"><div>${flag(c)} <strong>${esc(c.leader)}</strong><small>${esc(c.short)} · ${esc(a.persona)} · ${esc(a.objective)}</small><small>Dernière décision : J${a.lastDecisionDay} · ${esc(a.lastSource)}</small></div><span class="chip">${a.privateMemory.length} souvenirs</span></div>`;}).join('')}</div>`)}${panel('Règles de leur autonomie',`<div class="section-pad doc-note">Chaque agent ne reçoit que les informations publiques connues, ses propres données, ses courriers et sa mémoire. Ses décisions sont proposées sous forme d’ordres et contrôlées par le même moteur que vos commandes. Aucun agent ne tourne lorsque l’onglet est fermé sans serveur de simulation permanent.</div>`)}</div>`;}
+function chronicle(){return `<div class="content-stack"><div class="view-title"><div><div class="eyebrow">Archives du monde</div><h2>Chroniques et décisions</h2><p>Événements datés · aucun événement canonique sans exécution par le moteur</p></div></div>${panel('Journal mondial',logs(150))}${panel('Derniers ordres contrôlés',`<div class="section-pad">${s.notes.slice(-35).reverse().map(n=>`<div class="meta-line"><span>J${n.day} · ${esc(name(s.orders.find(o=>o.id===n.id)?.actor||10))} · ${esc(n.kind)}</span><strong class="${n.status==='refusé'?'down':'up'}">${esc(n.status)}</strong></div>${n.reason?`<p class="tiny warning">${esc(n.reason)}</p>`:''}`).join('')||'<p class="empty">Aucun ordre encore traité.</p>'}</div>`)}</div>`;}
+function settings(){const bytes=new Blob([JSON.stringify(s)]).size;return `<div class="content-stack"><div class="view-title"><div><div class="eyebrow">Administration du monde</div><h2>Sauvegardes et paramètres</h2><p>Graine initiale ${s.initialSeed} · Version ${esc(s.version)} · jour ${s.day}</p></div></div>${panel('Partie locale',`<div class="section-pad">${details([['Pays',`${s.countries.length}`],['Provinces',fmt(s.countries.reduce((n,c)=>n+c.provinces.length,0))],['Événements',fmt(s.events.length)],['Mouvements comptables',fmt(s.ledger.length)],['Taille de la sauvegarde',`${fmt(bytes/1024,1)} Ko`],['Mode IA',s.mode==='local'?'Règles':'Gemini']])}<div class="separator"></div><div class="btnrow">${btn('Enregistrer','save','primary')}${btn('Exporter la partie (.json)','export')}${btn('Importer une sauvegarde','import')}${btn('Nouvelle partie','reset','danger')}</div><input id="import-save" type="file" accept=".json,application/json" class="hidden"/></div>`)}${panel('Ce qui est calculé, ce qui reste à créer',`<div class="section-pad doc-note"><p><strong>Actif :</strong> 11 pays, 3 continents, 44 provinces initiales, naissances, mortalité et migrations internationales simplifiées, agriculture, trésoreries, recettes et dépenses, recherches, chantiers, cargaisons avec délais, prêts, traités, lois et effets sociaux, guerres, modifications de frontières, agents locaux, journaux et sauvegardes.</p><p><strong>À approfondir :</strong> marchés multi-marchandises, transport réel, classes sociales, cartographie géologique détaillée, armées en déplacement sur une grille, institutions internes, agents Gemini branchés et testés.</p><p><strong>Limites :</strong> carte géographique fictive schématique; jours en temps accéléré et non calcul continu physique; les données sont inventées au départ et ne représentent aucune économie historique réelle. La règle 100× concerne le lancement et non un bonus renouvelable.</p></div>`)}</div>`;}
+function topbar(){const c=player();return `<header class="topbar"><div class="location"><div class="eyebrow">WORLD DYNASTY · MONDE CAUSAL</div><h1>${esc(c.short)} <span class="muted">/ ${esc(CONTINENTS[c.continent].name)}</span></h1></div><div class="time-controls"><div class="date-area"><strong>${esc(humanDate())}</strong><span>J${s.day} · ${s.mode==='gemini'?'Agents Gemini':'Contrôleurs locaux'}</span></div>${[[0,'Ⅱ'],[1,'▶'],[3,'×3'],[10,'×10']].map(([n,t])=>`<button class="time-pill ${runSpeed===n?'selected':''}" title="${n===0?'Mettre en pause':`Avancer ${n} jour(s) par seconde`}" data-speed="${n}">${t}</button>`).join('')}<button class="more-button" title="Ordres" data-action="orders">+</button></div></header>`;}
+function shell(){const content=({overview,world,nations,resources,economy,population:populationScreen,commerce,diplomacy,military,science,agents,chronicle,settings,menu})[currentView]();return `<div class="app-shell"><aside class="sidebar"><div class="brand-area"><div class="brand-title">WORLD <span class="tint">DYNASTY</span></div><div class="brand-sub">Le monde n'attend personne</div></div><nav><div class="nav-title">Le monde</div><div class="nav-list">${views.map(([id,ic,label])=>`<button class="nav-item ${currentView===id?'active':''}" data-view="${id}"><span class="nav-icon">${ic}</span> ${label}</button>`).join('')}</div></nav><div class="sidebar-footer"><div class="eyebrow">Règle fondatrice</div><p class="tiny">Aucun pays n'est protégé. Les ressources ont des quantités, les décisions des coûts et les actions des conséquences.</p><div class="tag"><i class="dot ${server.geminiConfigured?'':'off'}"></i> ${server.geminiConfigured?'Gemini disponible':'IA locale simulée'}</div></div></aside><main class="main">${topbar()}${content}</main><nav class="mobile-nav">${[['overview','◈','Accueil'],['world','◉','Carte'],['resources','◆','Ressources'],['diplomacy','✉','Diplomatie'],['nations','♜','Pays'],['menu','☷','Plus']].map(([id,ic,label])=>`<button data-view="${id}" class="${currentView===id?'active':''}"><span class="mobile-ic">${ic}</span>${label}</button>`).join('')}</nav></div>${modal?modalHtml():''}${notice?`<div class="toast">${esc(notice)}</div>`:''}`;}
+function render(){renderCount++;app.innerHTML=shell();}
+function field(label,name,control){return `<div class="field"><label for="f-${name}">${label}</label>${control}</div>`;}
+function select(name,options){return `<select class="select" name="${name}" id="f-${name}">${options.map(([v,t])=>`<option value="${attr(v)}">${esc(t)}</option>`).join('')}</select>`;}
+function inp(name,type='number',val='',extra=''){return `<input class="input" type="${type}" name="${name}" id="f-${name}" value="${attr(val)}" ${extra} required/>`;}
+function ordersForm(){const targets=s.countries.filter(c=>c.id!==10).map(c=>[c.id,c.name]);const provinces=player().provinces.map(p=>[p.id,p.name]);const list=[['law','Adopter une loi'],['budget','Répartir le budget'],['project','Construire un bâtiment'],['policy','Changer la fiscalité'],['research','Financer la recherche'],['recruit','Recruter des soldats'],['demobilize','Démobiliser'],['relief','Aide à la population'],['explore','Prospection'],['extract','Extraction'],['propose','Proposer un traité'],['message','Message diplomatique'],['gift','Don diplomatique'],['trade','Vendre des ressources'],['loan','Proposer un prêt'],['declare_war','Déclarer une guerre'],['peace','Demander la paix'],['spy','Mission de renseignement']];
+const kind=modal.kind||'project';
+const other=field('Pays concerné','target',select('target',targets));
+let html='';
+switch(kind){
+ case 'law':html=field('Disposition législative','lawRule',select('lawRule',[['press=libre','Presse libre'],['press=censurée','Presse censurée'],['assembly=autorisé','Droit de réunion autorisé'],['assembly=restreint','Droit de réunion restreint'],['conscription=volontaire','Service militaire volontaire'],['conscription=obligatoire','Conscription obligatoire'],['judicial=civil','Justice civile'],['judicial=militaire','Justice militaire']]));break;
+ case 'budget':html=field('Part services sociaux','services',inp('services','number',player().budget.services,'min="0" max="1" step="0.01"'))+field('Part administration','administration',inp('administration','number',player().budget.administration,'min="0" max="1" step="0.01"'))+field('Part défense','defense',inp('defense','number',player().budget.defense,'min="0" max="1" step="0.01"'))+field('Part infrastructures','infrastructure',inp('infrastructure','number',player().budget.infrastructure,'min="0" max="1" step="0.01"'))+field('Part recherche','research',inp('research','number',player().budget.research,'min="0" max="1" step="0.01"'))+'<p class="doc-note">Les cinq parts doivent totaliser 1,00 (100 %).</p>';break;
+ case 'project':html=field('Projet','project',select('project',Object.entries(PROJECTS).map(([id,p])=>[id,`${p.label} — ${p.cost} M Cr`])))+field('Province','provinceId',select('provinceId',provinces));break;
+ case 'policy':html=field('Politique à modifier','policyField',select('policyField',[['taxRate','Fiscalité (de 0,02 à 0,48)'],['tariff','Droits de douane (0 à 40 %)'],['openBorders','Ouverture des frontières (0 à 1)'],['welfare','Aides sociales (0 à 1)'],['antiCorruption','Lutte anticorruption (0 à 1)'],['educationPriority','Priorité éducative (0 à 1)']]))+field('Nouvelle valeur','value',inp('value','number',player().taxRate,'step="0.01" min="0" max="40"'))+'<p class="doc-note">Une valeur de 0 ferme les frontières; 1 correspond à une ouverture maximale. Les effets se propagent progressivement.</p>';break;
+ case 'research':html=field('Technologie','technology',select('technology',Object.entries(TECHNOLOGIES).map(([id,t])=>[id,`${t.label} — ${t.cost} M Cr`])));break;
+ case 'recruit':case 'demobilize':html=field('Nombre de soldats','count',inp('count','number',kind==='recruit'?1000:500,'min="1" step="1"'));break;
+ case 'relief':html=field('Aide en millions de couronnes','amount',inp('amount','number',50,'min="10" max="2000"'));break;
+ case 'explore':html=field('Ressource à prospecter','resource',select('resource',RESOURCES.map(r=>[r.id,r.name])));break;
+ case 'extract':html=field('Ressource à extraire','resource',select('resource',RESOURCES.map(r=>[r.id,r.name])))+field('Quantité dans son unité','quantity',inp('quantity','number',1,'step="0.01" min="0.01"'));break;
+ case 'propose':html=other+field('Nature de l’accord','proposalKind',select('proposalKind',[['commerce','Commerce'],['alliance','Alliance'],['non_agression','Non-agression'],['paix','Paix']]));break;
+ case 'message':html=other+field('Message','text','<textarea name="text" id="f-text" class="textarea" minlength="2" maxlength="600" required>Nous souhaitons développer des relations diplomatiques.</textarea>');break;
+ case 'gift':html=other+field('Montant (M Cr)','amount',inp('amount','number',30,'step="1" min="1"'));break;
+ case 'trade':html=other+field('Ressource','resource',select('resource',[...RESOURCES,...COMMON].map(r=>[r.id,r.name])))+field('Quantité','quantity',inp('quantity','number',1,'step="0.01" min="0.001"'))+field('Prix total (M Cr)','price',inp('price','number',10,'step="0.01" min="0.01"'));break;
+ case 'loan':html=other+field('Somme prêtée (M Cr)','amount',inp('amount','number',100,'min="10"'))+field('Intérêts annuels (décimal)','rate',inp('rate','number',.05,'min="0" max="0.30" step="0.01"'))+field('Échéance en jours','duration',inp('duration','number',365,'min="30" max="3650"'));break;
+ default:html=other;
+ }
+ return `<div class="form-info">Vous dirigez Astérie. Vos ordres sont mis en file et appliqués lors du prochain jour de simulation. Un ordre impossible sera refusé, sans créer d’argent ni de ressources.</div><form id="orders-form" class="fieldset"><div class="field">${field('Nature de l’ordre','kind',select('kind',list.map(([id,label])=>[id,label]).sort((a,b)=>a[0]===kind?-1:b[0]===kind?1:0)))}</div>${html}<button class="btn primary wide" type="submit">Transmettre l’ordre</button></form>`;
+}
+function modalHtml(){return `<div class="modal-wrap" data-action="close" id="modal-backdrop"><div class="dialog" role="dialog" aria-modal="true" aria-label="Ordres du souverain"><div class="dialog-top"><h3>Ordres du souverain</h3><button class="dialog-close" data-action="close" aria-label="Fermer">×</button></div><div class="dialog-body">${ordersForm()}</div></div></div>`;}
+function setView(id){if(!views.some(v=>v[0]===id))return;currentView=id;window.scrollTo({top:0,behavior:'instant'});render();}
+function submitOrder(form){const d=Object.fromEntries(new FormData(form)),kind=d.kind;delete d.kind;let payload={};
+ for(const [k,v] of Object.entries(d))payload[k]=v;
+ if(payload.target!==undefined)payload.target=Number(payload.target);
+ for(const key of ['count','quantity','price','amount','rate','duration','value'])if(payload[key]!==undefined)payload[key]=Number(payload[key]);
+ if(kind==='law'){const rule=payload.lawRule.split('=');payload={field:rule[0],value:rule[1]};}
+ if(kind==='budget'){payload={budget:{services:Number(payload.services),administration:Number(payload.administration),defense:Number(payload.defense),infrastructure:Number(payload.infrastructure),research:Number(payload.research)}};}
+ if(kind==='policy')payload={field:payload.policyField,value:payload.value};
+ if(kind==='propose'){payload.kind=payload.proposalKind;delete payload.proposalKind;}
+ try{const o=command(s,10,kind,payload);modal=null;save();message(`Ordre n°${o.id} transmis. Il sera examiné au prochain jour.`);}catch(e){message(e.message||'Commande refusée.');}
+}
+function resetWorld(){if(!confirm('Créer un nouveau monde ? La sauvegarde locale actuelle sera remplacée. Exportez-la d’abord si nécessaire.'))return;runSpeed=0;s=createWorld();selectedNation=10;selectedProvince=null;continentFilter='all';currentView='overview';save();message('Nouveau monde créé, au 1er janvier 1800.');}
+function exportWorld(){const file=new Blob([JSON.stringify(s,null,2)],{type:'application/json'}),url=URL.createObjectURL(file),a=document.createElement('a');a.href=url;a.download=`WORLD_DYNASTY_J${s.day}_${s.initialSeed}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
+async function importWorld(file){try{if(file.size>15_000_000)throw Error('Sauvegarde trop lourde');const value=restoreWorld(await file.text());runSpeed=0;s=value;selectedNation=10;selectedProvince=null;save();message('Sauvegarde importée. Simulation en pause.');}catch(e){message(`Importation refusée : ${e.message}`);}}
+async function unlockGemini(){const accessCode=prompt('Code d’accès privé WORLD DYNASTY (pas la clé Gemini) :');if(!accessCode)return;try{const r=await fetch('/api/session',{method:'POST',headers:{'content-type':'application/json'},credentials:'same-origin',body:JSON.stringify({accessCode})});const d=await r.json();if(!r.ok)throw Error(d.error||'Accès refusé');server=await (await fetch('/api/status',{credentials:'same-origin'})).json();message('Gemini déverrouillé. Tu peux activer les dix agents.');}catch(e){message(e.message);}}
+function changeMode(id){if(id==='gemini'&&!server.geminiConfigured){message('Configure d’abord GEMINI_API_KEY sur le serveur.');return;}if(id==='gemini'&&!confirm('Activer Gemini ? Les requêtes utilisent les quotas et les conditions tarifaires de votre projet Google.'))return;s.mode=id;save();message(id==='gemini'?'Mode Gemini activé. Les 10 agents réfléchiront à tour de rôle pendant la simulation.':'Contrôleurs locaux activés.');}
+function step(days){try{tick(s,days);save();render();}catch(e){runSpeed=0;message(e.message);}}
+let lastAuto=Date.now();setInterval(()=>{if(!runSpeed)return;const now=Date.now();if(now-lastAuto<900)return;lastAuto=now;try{tick(s,runSpeed);save();render();}catch(e){runSpeed=0;message(e.message);}},1000);
+async function maybeGemini(){if(s.mode!=='gemini'||!runSpeed||!server.geminiConfigured||activeAgent)return;const now=Date.now();if(now-lastAgentCall<7000)return;const agent=s.agents.find(a=>a.nextDecisionDay<=s.day);if(!agent)return;
+ activeAgent=true;lastAgentCall=now;
+ try{const view=agentView(s,agent.countryId);const r=await fetch('/api/agent',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(view)});const data=await r.json();if(!r.ok)throw Error(data.error||`Erreur ${r.status}`);
+ if(s.mode!=='gemini')return;applyAgentDecision(s,agent.countryId,data.decision);agentError='';save();render();}
+ catch(e){agentError=e.message||'Erreur de connexion';runSpeed=0;save();message('Simulation mise en pause : Gemini ne répond pas. Vérifie les quotas ou repasse en mode local.');}
+ finally{activeAgent=false;}
+}
+setInterval(maybeGemini,2000);
+app.addEventListener('change',async e=>{if(e.target.id==='import-save'&&e.target.files?.[0])await importWorld(e.target.files[0]);if(e.target.name==='kind'&&modal){modal.kind=e.target.value;render();}if(e.target.name==='policyField'){const node=document.querySelector('#f-value');if(node){const k=e.target.value;node.value=k==='taxRate'?player().taxRate:k==='tariff'?player().tariff:player().policy[k];}}});
+app.addEventListener('submit',e=>{if(e.target.id==='orders-form'){e.preventDefault();submitOrder(e.target);}});
+app.addEventListener('click',e=>{
+ const kind=e.target.closest('[data-view]');if(kind){setView(kind.dataset.view);return;}
+ const clickCont=e.target.closest('[data-continent]');if(clickCont){continentFilter=clickCont.dataset.continent;currentView=currentView==='overview'?'world':currentView;render();return;}
+ const layer=e.target.closest('[data-layer]');if(layer){mapLayer=layer.dataset.layer;render();return;}
+ const selectProvince=e.target.closest('[data-province]');if(selectProvince){const p=prov(selectProvince.dataset.province);if(p){selectedProvince=p.id;selectedNation=p.countryId;render();}return;}
+ const selectCountry=e.target.closest('[data-country]');if(selectCountry){selectedNation=Number(selectCountry.dataset.country);selectedProvince=null;currentView='nations';render();return;}
+ const speed=e.target.closest('[data-speed]');if(speed){runSpeed=Number(speed.dataset.speed);lastAuto=Date.now();render();return;}
+ const response=e.target.closest('[data-respond]');if(response){const id=Number(response.dataset.respond),accept=response.dataset.accept==='true';try{command(s,10,'respond',{proposalId:id,accept});save();message('Réponse enregistrée pour le prochain jour.');}catch(ex){message(ex.message);}return;}
+ const research=e.target.closest('[data-research]');if(research){try{command(s,10,'research',{technology:research.dataset.research});save();message('Recherche inscrite dans les ordres.');}catch(ex){message(ex.message);}return;}
+ const actionEl=e.target.closest('[data-action]');if(!actionEl)return;
+ const action=actionEl.dataset.action;
+ if(action==='close'){if(e.target.id==='modal-backdrop'||actionEl.classList.contains('dialog-close')){modal=null;render();}return;}
+ if(action==='orders'){modal={kind:'project'};render();return;}
+ if(action==='world'||action==='nations'||action==='chronicle'||action==='resources'){setView(action);return;}
+ if(action==='open-diplomacy'){setView('diplomacy');return;}
+ if(action==='view-country'){setView('nations');return;}
+ if(action==='save'){save();message('Partie enregistrée sur cet appareil.');return;}
+ if(action==='export'){exportWorld();return;}
+ if(action==='import'){document.querySelector('#import-save')?.click();return;}
+ if(action==='reset'){resetWorld();return;}
+ if(action==='set-local'){changeMode('local');return;}
+ if(action==='set-gemini'){changeMode('gemini');return;}
+ if(action==='unlock-gemini'){unlockGemini();return;}
+});
+window.addEventListener('beforeunload',()=>save());
+fetch('/api/status').then(r=>r.json()).then(x=>{server=x;render();}).catch(()=>{server={geminiConfigured:false};render();});
+render();
+</script></body></html>
