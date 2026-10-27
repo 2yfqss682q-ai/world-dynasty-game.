@@ -786,46 +786,74 @@ function politicsDay(s,c){
 function expireProposals(s){for(const p of s.proposals)if(p.status==='en attente'&&s.day>=p.expires){p.status='expirée';event(s,'diplomacy',`Proposition n°${p.id} expirée.`,[p.from,p.to]);}}
 function localAgentChoice(s,a){
   const c=countryById(s,a.countryId);
-  const needs=c.stocks.cereales<population(c)*.022/1000;
-  const incoming=c.messages.filter(m=>m.to===c.id&&!m.outgoing).at(-1);
-  if(incoming&&incoming.day>(a.lastInboxDay??-1)){a.lastInboxDay=incoming.day;
-    return {type:'message',payload:{target:incoming.from,text:`${c.short} souhaite négocier des conditions précises de coopération économique et de sécurité régionale. Notre chancellerie demande des propositions chiffrées.`},reason:'Ouverture de négociation sur une dépêche reçue'};
-  }
-  const open=s.proposals.find(p=>p.to===c.id&&p.status==='en attente');
-  if(open){
-    const favorable=open.kind==='paix'||open.kind==='non_agression'||open.kind==='commerce'||
-      (open.kind==='purchase_request'&&c.stocks[open.resource]>=open.quantity&&c.relations[open.from]>-.5)||
-      (open.kind==='trade'&&c.treasury>open.price*1.8 && open.quantity>0)||
-      (open.kind==='loan'&&c.treasury<1200)||
-      (open.kind==='alliance'&&c.relations[open.from]>.1);
-    return {type:'respond',payload:{proposalId:open.id,accept:favorable},reason:'Évaluation privée d’une proposition reçue'};
+  const blocked=id=>c.embargoes?.includes(id)||countryById(s,id)?.embargoes?.includes(c.id);
+  const pending=(kind,id)=>s.proposals.some(p=>p.status==='en attente'&&p.kind===kind&&p.from===c.id&&(id===undefined||p.to===id));
+  const grainConsumption=population(c)*.292/1000/365;
+  const grainDays=c.stocks.cereales/Math.max(.001,grainConsumption);
+  const incoming=s.proposals.find(p=>p.to===c.id&&p.status==='en attente');
+  if(incoming){
+    const source=countryById(s,incoming.from);
+    const friendly=c.relations[source.id]>-.35;
+    const trade=incoming.kind==='trade'&&c.treasury>=incoming.price*1.2&&friendly&&grainDays>20;
+    const purchase=incoming.kind==='purchase_request'&&c.stocks[incoming.resource]>=incoming.quantity&&friendly;
+    const loan=incoming.kind==='loan'&&c.treasury<1000&&friendly;
+    const favorable=incoming.kind==='paix'||(friendly&&['commerce','non_agression'].includes(incoming.kind))||
+      (incoming.kind==='alliance'&&c.relations[source.id]>.18)||((trade||purchase||loan)&&!blocked(source.id));
+    return {type:'respond',payload:{proposalId:incoming.id,accept:favorable},reason:'Évaluation économique et diplomatique du contrat'};
   }
   const war=s.wars.find(w=>w.status==='en cours'&&w.participants.includes(c.id));
-  if(war&&c.warExhaustion>.3)return {type:'peace',payload:{target:war.participants.find(x=>x!==c.id)},reason:'Faire cesser une guerre coûteuse'};
-  if(needs&&c.treasury>175)return {type:'project',payload:{project:'fermes',provinceId:c.provinces[0].id},reason:'Renforcer les ressources alimentaires'};
-  const hostile=s.countries.filter(z=>z.id!==c.id&&c.relations[z.id]<-.24&&z.continent===c.continent);
-  if(!war&&hostile.length&&a.risk>.54&&c.soldiers>13000&&c.militaryReadiness>.52&&random(s)<.16){
-    const enemy=hostile[Math.floor(random(s)*hostile.length)];
-    return {type:'declare_war',payload:{target:enemy.id},reason:`Rivalité territoriale contre ${enemy.short}`};
+  if(war&&c.warExhaustion>.18&&!pending('paix'))
+    return {type:'peace',payload:{target:war.participants.find(id=>id!==c.id)},reason:'Évaluer une sortie diplomatique du conflit'};
+  const seller=s.countries.filter(x=>x.id!==c.id&&x.stocks.cereales>Math.max(4,population(x)*.292/1000/365*38)&&!blocked(x.id))
+    .sort((x,y)=>(x.continent===c.continent?-1:1)-(y.continent===c.continent?-1:1)||c.relations[y.id]-c.relations[x.id])[0];
+  if(grainDays<26&&seller&&c.treasury>55&&!pending('purchase_request',seller.id)){
+    const quantity=rnd(Math.min(10,Math.max(.5,seller.stocks.cereales*.035)),3);
+    const price=rnd(quantity*1.6*(s.market?.index?.cereales||100)/100,2);
+    return {type:'request_trade',payload:{target:seller.id,resource:'cereales',quantity,price},reason:'Protéger les approvisionnements alimentaires'};
   }
-  if(c.soldiers<11000&&c.treasury>350&&a.risk>.58&&random(s)<.25)return {type:'recruit',payload:{count:1800},reason:'Renforcement préventif de l’armée'};
-  if(c.treasury>750&&random(s)<.43){
-    const options=['routes','ecoles','hopital','ateliers','mines','eau'];
-    const project=options[Math.floor(random(s)*options.length)];
-    const prov=c.provinces[Math.floor(random(s)*c.provinces.length)];
-    return {type:'project',payload:{project,provinceId:prov.id},reason:`Priorité nationale : ${a.objective}`};
+  if(grainDays>70&&!pending('trade')){
+    const buyers=s.countries.filter(x=>x.id!==c.id&&!blocked(x.id)&&x.treasury>65)
+      .sort((x,y)=>x.stocks.cereales/Math.max(1,population(x))-y.stocks.cereales/Math.max(1,population(y))||x.id-y.id);
+    if(buyers.length&&random(s)<.38){
+      const buyer=buyers[Math.floor(random(s)*Math.min(3,buyers.length))];
+      const quantity=rnd(Math.min(8,Math.max(.5,c.stocks.cereales*.02)),3);
+      return {type:'trade',payload:{target:buyer.id,resource:'cereales',quantity,price:rnd(quantity*1.8*(s.market?.index?.cereales||100)/100,2)},reason:'Exporter des excédents agricoles'};
+    }
   }
-  if(c.treasury>1500&&!c.tech.known.includes('geologie')&&!c.tech.progress.some(r=>r.technology==='geologie')&&random(s)<.45)
-    return {type:'research',payload:{technology:'geologie'},reason:'Modernisation des connaissances'};
-  if(c.stability<.45&&c.treasury>50)return {type:'relief',payload:{amount:50},reason:'Apaiser les tensions sociales'};
-  if(c.taxRate>.23&&random(s)<.3)return {type:'policy',payload:{field:'taxRate',value:rnd(c.taxRate-.012,3)},reason:'Fiscalité considérée trop lourde'};
-  const other=s.countries.filter(z=>z.id!==c.id).sort((x,y)=>c.relations[y.id]-c.relations[x.id])[0];
-  if(other&&c.relations[other.id]>.18&&random(s)<.45)return {type:'propose',payload:{target:other.id,kind:random(s)<.35?'alliance':'commerce'},reason:'Accroître la coopération bilatérale'};
-  if(other&&c.stocks.cereales>population(c)*.09/1000&&random(s)<.25)
-    return {type:'trade',payload:{target:other.id,resource:'cereales',quantity:Math.min(9,rnd(c.stocks.cereales*.03,3)),price:14},reason:'Exportation de produits agricoles'};
-  if(other&&c.treasury>2200&&random(s)<.2)return {type:'gift',payload:{target:other.id,amount:30},reason:'Influence et aide extérieure'};
-  if(c.treasury>200)return {type:'project',payload:{project:'routes',provinceId:c.provinces[Math.floor(random(s)*c.provinces.length)].id},reason:'Développement du réseau national'};
-  return {type:'policy',payload:{field:'taxRate',value:clamp(rnd(c.taxRate+(random(s)-.5)*.01,3),.08,.3)},reason:'Ajustement prudent de la fiscalité'};
+  if(c.treasury>480&&!war){
+    const building=s.projects.filter(pr=>pr.owner===c.id&&pr.status==='chantier').length;
+    const active=(s.programs||[]).filter(pr=>pr.owner===c.id&&pr.status==='en cours').length;
+    const priority=(a.objective+' '+a.persona).toLowerCase();
+    const sector=priority.includes('commerce')?'transport':priority.includes('réforme')?'education':
+      priority.includes('milit')?'transport':priority.includes('agric')?'agriculture':'industrialisation';
+    const prov=[...c.provinces].sort((x,y)=>x[PROGRAM_SECTORS[sector].field]-y[PROGRAM_SECTORS[sector].field])[0];
+    if(active<2&&random(s)<.38)return {type:'program',payload:{sector,budget:Math.min(450,Math.max(90,Math.round(c.treasury*.22))),duration:540,provinceId:prov.id},
+      reason:'Investissement pluriannuel et dépenses contrôlées'};
+    if(building<2&&c.treasury>950&&random(s)<.40){
+      const options=['routes','fermes','ecoles','ateliers','eau','port'].filter(t=>PROJECTS[t].cost+600<c.treasury);
+      if(options.length)return {type:'project',payload:{project:options[Math.floor(random(s)*options.length)],provinceId:prov.id},reason:'Infrastructure prioritaire'};
+    }
+  }
+  if(c.stability<.48&&c.treasury>250)return {type:'relief',payload:{amount:30},reason:'Atténuer les tensions sociales'};
+  if(c.treasury>1200&&!c.tech.known.includes('geologie')&&!c.tech.progress.some(z=>z.technology==='geologie'))
+    return {type:'research',payload:{technology:'geologie'},reason:'Moderniser la recherche géologique'};
+  const candidates=s.countries.filter(x=>x.id!==c.id&&!blocked(x.id));
+  const ally=[...candidates].sort((x,y)=>c.relations[y.id]-c.relations[x.id])[0];
+  const threat=[...candidates].sort((x,y)=>c.relations[x.id]-c.relations[y.id])[0];
+  if(threat&&c.relations[threat.id]<-.68&&random(s)<.22)
+    return {type:'embargo',payload:{target:threat.id},reason:'Sanctionner une rivalité économique et diplomatique'};
+  const commercialTreaty=ally&&s.treaties.some(t=>t.active&&t.members.includes(c.id)&&t.members.includes(ally.id)&&t.kind==='commerce');
+  if(ally&&c.relations[ally.id]>.12&&!pending('commerce',ally.id)&&!commercialTreaty&&random(s)<.36)
+    return {type:'propose',payload:{target:ally.id,kind:random(s)<.36?'alliance':'commerce'},reason:'Étendre la coopération régionale'};
+  if(!war&&threat&&c.relations[threat.id]<-.48&&threat.continent===c.continent&&c.soldiers>threat.soldiers*1.7&&c.treasury>1000&&a.risk>.6&&random(s)<.04)
+    return {type:'declare_war',payload:{target:threat.id},reason:'Crise militaire régionale après une rivalité prolongée'};
+  if(c.taxRate>.23)return {type:'policy',payload:{field:'taxRate',value:rnd(Math.max(.12,c.taxRate-.005),3)},reason:'Réduire la pression fiscale'};
+  if(c.treasury<190&&c.taxRate<.25)return {type:'policy',payload:{field:'taxRate',value:rnd(c.taxRate+.005,3)},reason:'Stabiliser les recettes publiques'};
+  if(c.embargoes?.length&&random(s)<.12)return {type:'lift_embargo',payload:{target:c.embargoes[0]},reason:'Réévaluer la politique de sanctions'};
+  const partner=candidates[Math.floor(random(s)*candidates.length)];
+  if(partner&&random(s)<.24)return {type:'message',payload:{target:partner.id,text:`Le gouvernement de ${c.short} ouvre une consultation avec ${partner.short} sur les perspectives commerciales et la sécurité régionale.`},reason:'Démarche diplomatique'};
+  if(c.policy.antiCorruption<.98)return {type:'policy',payload:{field:'antiCorruption',value:clamp(rnd(c.policy.antiCorruption+.015,3),0,1)},reason:'Renforcement de l’administration publique'};
+  return {type:'policy',payload:{field:'educationPriority',value:clamp(rnd(c.policy.educationPriority+.01,3),0,1)},reason:'Priorité nationale aux services publics'};
 }
 function scheduleLocalAgents(s){
   for(const a of s.agents){
