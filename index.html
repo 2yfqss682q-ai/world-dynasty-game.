@@ -119,6 +119,18 @@ body{background:radial-gradient(ellipse at 85% -10%,#2b4b4c 0,transparent 43%),l
 .gameplay-notices button{border:0;background:none;color:#f0d08f;text-decoration:underline;font-size:11px}.victory-label{background:#17463d;color:#d1f6e4;border:1px solid #6ba88d;padding:16px;border-radius:7px;font-size:13px}
 @media(max-width:1260px){.quick-decisions{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:700px){.quick-decisions{grid-template-columns:repeat(2,minmax(0,1fr))}.gameplay-title{padding:18px}.gameplay-clock{display:none}.campaign-step{display:block;text-align:center}.campaign-step b{margin:auto auto 6px}.campaign-step span{font-size:10px}.current-objective{display:block}.current-objective button{width:100%;margin-top:10px}}
+
+.map-container svg{background:#0b2734;border:1px solid #506b70;box-shadow:inset 0 0 45px #0006}
+.map-container{overflow:hidden}
+.province{stroke:#dce7ca88;stroke-width:1.15;transition:stroke .12s,filter .12s;cursor:pointer;filter:saturate(.8)}
+.province:hover,.province.selected{stroke:#ffecaf;stroke-width:3.5;filter:brightness(1.2) saturate(1.15)}
+.province.player{stroke:#f5d18b;stroke-width:2.6}
+.landmass{fill:#6d8e7d}
+.nation-label{font-size:13px;stroke-width:3px;fill:#fff8df;font-weight:800;letter-spacing:.1em}
+.capital-group{pointer-events:none}
+.map-city{fill:#f9e6b7;stroke:#162632;stroke-width:1}
+.ocean-label{font:italic 21px Georgia,serif;letter-spacing:.2em;fill:#9bbaba;opacity:.3}
+.continent-label{font:italic 18px Georgia,serif;letter-spacing:.17em;fill:#e3d8ba;opacity:.7}
 </style></head><body><div id="app"><div class="boot">WORLD DYNASTY — chargement du monde</div></div><script>/* WORLD DYNASTY — Monde original, données initiales reproductibles. */
 const START_YEAR = 1800;
 const PLAYER_ID = 10;
@@ -344,11 +356,26 @@ const playerNation=s=>s.countries[s.playerId];
 const countryById=(s,id)=>s.countries.find(c=>c.id===Number(id));
 function point(q,u,v){const [a,b,c,d]=q;const mix=(p,z,t)=>p+(z-p)*t;return [rnd(mix(mix(a[0],b[0],u),mix(d[0],c[0],u),v),1),rnd(mix(mix(a[1],b[1],u),mix(d[1],c[1],u),v),1)];}
 function polygonArea(poly){let result=0;for(let i=0;i<poly.length;i++){const [x,y]=poly[i], [u,v]=poly[(i+1)%poly.length];result+=x*v-u*y;}return Math.abs(result)/2;}
+function organicPoint(n,u,v){
+ // Geometry is deterministic: adjacent provinces reuse the exact same points on shared borders.
+ const p=point(n.corners,u,v);
+ const wX=3.1*Math.sin(v*17+n.id*.64)+1.4*Math.sin(v*37+n.id*.91);
+ const wY=3.2*Math.sin(u*19+n.id*.77)+1.5*Math.sin(u*41+n.id*.51);
+ return [rnd(p[0]+wX,1),rnd(p[1]+wY,1)];
+}
+function organicProvince(n,west,east,north,south){
+ const pts=[],steps=5;
+ for(let i=0;i<=steps;i++)pts.push(organicPoint(n,west+(east-west)*i/steps,north));
+ for(let i=1;i<=steps;i++)pts.push(organicPoint(n,east,north+(south-north)*i/steps));
+ for(let i=1;i<=steps;i++)pts.push(organicPoint(n,east-(east-west)*i/steps,south));
+ for(let i=1;i<steps;i++)pts.push(organicPoint(n,west,south-(south-north)*i/steps));
+ return pts;
+}
 function makeProvinces(s,nation){
   const weights=[.21,.27,.24,.28];const total= nation.population;let allocated=0;
   return PROVINCE_PARTS.map((name,j)=>{
     const u=j%2*.5,v=Math.floor(j/2)*.5;
-    const square=[point(nation.corners,u,v),point(nation.corners,u+.5,v),point(nation.corners,u+.5,v+.5),point(nation.corners,u,v+.5)];
+    const square=organicProvince(nation,u,u+.5,v,v+.5);
     const pop=j===3?total-allocated:Math.round(total*weights[j]);allocated+=pop;
     return {id:`p${nation.id}-${j}`,countryId:nation.id,name:`${name} de ${nation.short}`,polygon:square,
       areaKm2:Math.max(1,Math.round(polygonArea(square)*25)),population:pop,terrain:['vallées','plateaux','collines','plaines'][j],
@@ -1174,17 +1201,56 @@ function rankings(sortBy='gdpAnnual'){
 function mapMarkup(){
  const visible=continentFilter==='all'?s.countries:s.countries.filter(c=>c.continent===Number(continentFilter));
  const viewbox=continentFilter==='all'?'0 0 1200 690':CONTINENTS[Number(continentFilter)].viewBox;
- const label=CONTINENTS.map((c,i)=>{const pos=[[294,75],[918,78],[608,408]][i];return `<text class="continent-label" x="${pos[0]}" y="${pos[1]}" text-anchor="middle">${c.name.toUpperCase()}</text>`;}).join('');
+ const center=c=>[c.corners.reduce((n,p)=>n+p[0],0)/4,c.corners.reduce((n,p)=>n+p[1],0)/4];
+ const continentNames=CONTINENTS.map((c,i)=>{const pos=[[292,82],[915,85],[614,400]][i];return `<text class="continent-label" x="${pos[0]}" y="${pos[1]}" text-anchor="middle">${esc(c.name.toUpperCase())}</text>`;}).join('');
  const cells=visible.flatMap(c=>c.provinces.map(p=>{
   const pts=p.polygon.map(q=>q.join(',')).join(' ');
   let fill=c.color;
-  if(mapLayer==='population'){const value=p.population/Math.max(1,p.areaKm2),a=Math.min(80,Math.max(14,Math.round(value*3)));fill=`hsl(31 64% ${a}%)`;}
-  if(mapLayer==='stabilite'){fill=`hsl(${Math.round((1-p.unrest)*125)} 43% 40%)`;}
-  if(mapLayer==='agriculture'){fill=`hsl(105 45% ${Math.round(20+p.fertility*50)}%)`;}
-  return `<polygon class="province ${c.id===10?'player':''} ${selectedProvince===p.id?'selected':''}" points="${pts}" fill="${fill}" data-province="${attr(p.id)}"><title>${esc(p.name)} — ${fmt(p.population)} hab.</title></polygon>`;
+  if(mapLayer==='population'){const density=p.population/Math.max(1,p.areaKm2);fill=`hsl(31 58% ${Math.min(72,Math.max(17,Math.round(density*3)))}%)`;}
+  if(mapLayer==='stabilite')fill=`hsl(${Math.round((1-p.unrest)*125)} 39% 37%)`;
+  if(mapLayer==='agriculture')fill=`hsl(105 37% ${Math.round(17+p.fertility*42)}%)`;
+  return `<polygon class="province ${c.id===10?'player':''} ${selectedProvince===p.id?'selected':''}" points="${pts}" fill="${fill}" data-province="${attr(p.id)}"><title>${esc(p.name)} — ${fmt(p.population)} habitants</title></polygon>`;
  })).join('');
- const capitals=visible.map(c=>{const q=c.corners;const x=q.reduce((a,p)=>a+p[0],0)/4,y=q.reduce((a,p)=>a+p[1],0)/4;return `<circle class="map-city" cx="${x}" cy="${y}" r="3.5"/><text class="nation-label" x="${x}" y="${y-12}" text-anchor="middle" style="font-size:12px">${esc(c.short)}</text>`;}).join('');
- return `<div class="map-controls">${[['all','Les 3 continents'],...CONTINENTS.map(c=>[String(c.id),c.name])].map(([id,t])=>`<button data-continent="${id}" class="${String(continentFilter)===id?'active':''}">${t}</button>`).join('')}</div><div class="map-controls layerline">${[['politique','Politique'],['population','Densité'],['stabilite','Tensions'],['agriculture','Fertilité']].map(([id,t])=>`<button data-layer="${id}" class="${mapLayer===id?'active':''}">${t}</button>`).join('')}</div><div class="map-container"><svg viewBox="${viewbox}" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Carte interactive des trois continents et des onze pays"><rect x="0" y="0" width="1200" height="690" fill="#102f41"/><path class="landmass" d="M67 99 Q143 54 261 74 L503 101 L505 267 L481 369 L280 372 L87 366 L63 241 Z"/><path class="landmass" d="M699 96 Q798 53 918 77 L1120 96 L1131 251 L1111 363 L707 368 L686 261 Z"/><path class="landmass" d="M360 409 L889 403 L894 597 L859 643 L369 638 L348 513 Z"/><text class="ocean-label" x="589" y="221" text-anchor="middle">OCÉAN</text>${label}${cells}${capitals}</svg></div><div class="map-legend"><span>◆ Astérie : votre nation</span><span>Appuyez sur une province pour l’inspecter.</span><span>Carte fictive originale, pas une carte terrestre réelle</span></div>`;
+ const capitals=visible.map(c=>{
+  const [x,y]=center(c);
+  return `<g class="capital-group" aria-label="Capitale de ${esc(c.short)}"><circle cx="${x}" cy="${y}" r="7" fill="#102a36" fill-opacity=".75" stroke="#e8e1c4" stroke-width=".65"/><circle class="map-city" cx="${x}" cy="${y}" r="3"/><text class="nation-label" x="${x}" y="${y-13}" text-anchor="middle" style="font-size:13px">${esc(c.short)}</text></g>`;
+ }).join('');
+ const sea=`<defs>
+  <radialGradient id="sea-grad"><stop offset="0%" stop-color="#1e4952"/><stop offset="85%" stop-color="#0c2737"/><stop offset="100%" stop-color="#0a1b2a"/></radialGradient>
+  <pattern id="wavepattern" width="52" height="50" patternUnits="userSpaceOnUse"><path d="M0 18 Q13 12 26 18 T52 18 M0 40 Q13 34 26 40 T52 40" fill="none" stroke="#aec6b2" stroke-opacity=".055" stroke-width="1"/></pattern>
+  <filter id="land-grain" x="-10%" y="-10%" width="120%" height="120%"><feTurbulence type="fractalNoise" baseFrequency=".035" numOctaves="2" seed="13" result="noise"/><feColorMatrix in="noise" type="saturate" values="0" result="mono"/><feBlend in="SourceGraphic" in2="mono" mode="soft-light"/></filter>
+ </defs><rect width="1200" height="690" fill="url(#sea-grad)"/><rect width="1200" height="690" fill="url(#wavepattern)"/>
+ <g fill="#53766c" fill-opacity=".28" stroke="#9bbaa0" stroke-opacity=".65" stroke-width="3.2">
+  <path d="M76 113 Q94 72 160 76 L228 66 Q296 66 351 79 L448 91 Q494 96 493 145 L487 227 L486 293 Q475 355 405 366 L326 380 Q233 388 171 376 L93 376 Q72 345 70 303 L59 226 Z"/>
+  <path d="M714 92 Q763 57 819 64 Q881 53 943 68 L1040 78 Q1125 78 1133 128 L1138 201 Q1141 271 1118 312 L1090 370 Q1029 387 966 374 L858 388 L739 373 Q686 342 692 281 L690 188 Z"/>
+  <path d="M355 426 Q405 399 474 404 L591 401 Q678 401 754 404 L857 411 Q892 432 894 485 L890 574 Q880 645 811 650 L701 642 Q617 657 538 643 L404 656 Q365 632 354 577 L339 485 Z"/>
+ </g>`;
+ const relief=`<g pointer-events="none" fill="none" stroke="#f0e2b9" stroke-width="1.3" stroke-opacity=".34">
+  <path d="M107 158 Q147 143 196 162 T289 159 M102 174 Q162 161 207 179 T300 174 M332 302 Q376 290 444 298"/>
+  <path d="M752 179 Q804 148 860 172 T948 176 M757 197 Q810 166 870 190 T951 196 M980 306 Q1038 277 1095 307"/>
+  <path d="M393 490 Q445 469 509 492 T626 486 M393 503 Q464 481 532 505 T652 503"/>
+ </g><g pointer-events="none" fill="none" stroke="#a6d9db" stroke-opacity=".78" stroke-width="2.1">
+  <path d="M169 100 Q178 148 207 196 T218 295 Q234 325 245 359"/>
+  <path d="M824 111 Q805 147 835 199 T848 279 Q861 311 878 364"/>
+  <path d="M654 421 Q624 475 644 520 T654 614"/>
+ </g>`;
+ const recentShipping=s.shipments.filter(sh=>sh.status==='en transit').slice(-20);
+ const routes=recentShipping.map(sh=>{
+  const from=s.countries.find(c=>c.id===sh.from),to=s.countries.find(c=>c.id===sh.to);if(!from||!to)return '';
+  if(!visible.includes(from)||!visible.includes(to))return '';
+  const [fx,fy]=center(from),[tx,ty]=center(to),my=(fy+ty)/2-30;
+  return `<path d="M${fx} ${fy} Q${(fx+tx)/2} ${my} ${tx} ${ty}" stroke="#f6dca4" stroke-width="2" stroke-dasharray="8 6" stroke-opacity=".75" fill="none" pointer-events="none"><title>Transport de ${esc(sh.resource)} : ${esc(from.short)} vers ${esc(to.short)}</title></path>`;
+ }).join('');
+ const wars=s.wars.filter(w=>w.status==='en cours').map(w=>{
+  const from=s.countries.find(c=>c.id===w.attacker),to=s.countries.find(c=>c.id===w.defender);if(!from||!to||!visible.includes(from)||!visible.includes(to))return '';
+  const a=center(from),b=center(to);
+  return `<line x1="${a[0]}" y1="${a[1]}" x2="${b[0]}" y2="${b[1]}" stroke="#f4a08b" stroke-width="5" stroke-dasharray="7 5" stroke-opacity=".9" pointer-events="none"/>`;
+ }).join('');
+ return `<div class="map-controls">${[['all','Monde entier'],...CONTINENTS.map(c=>[String(c.id),c.name])].map(([id,t])=>`<button data-continent="${id}" class="${String(continentFilter)===id?'active':''}">${t}</button>`).join('')}</div>
+ <div class="map-controls layerline">${[['politique','Frontières'],['population','Densité'],['stabilite','Tensions'],['agriculture','Agriculture']].map(([id,t])=>`<button data-layer="${id}" class="${mapLayer===id?'active':''}">${t}</button>`).join('')}</div>
+ <div class="map-container"><svg viewBox="${viewbox}" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Carte politique dynamique : nations, provinces, routes commerciales et conflits">
+ ${sea}${continentNames}${cells}${relief}${routes}${wars}${capitals}</svg></div>
+ <div class="map-legend"><span>◆ Astérie : votre État</span><span>Pointillés dorés : cargaisons en route · rouge : conflits</span><span>Appuyer sur une province pour l’inspecter</span></div>`;
 }
 function profile(c){const x=nationalStats(c);return `<div class="ruler"><div class="ruler-badge"><div class="ruler-icon">▦</div><div><div class="ruler-name">${esc(c.name)}</div><div class="ruler-small">${esc(c.regime)} · ${esc(c.capital)}</div><div class="ruler-small">${esc(c.short)} · ${esc(CONTINENTS[c.continent].name)}</div></div></div>${rowLine('Population',fmt(x.population))}${rowLine('Superficie',`${fmt(x.areaKm2)} km²`)}${rowLine('Trésorerie',money(c.treasury))}${rowLine('Forces armées',fmt(c.soldiers))}${rowLine('Stabilité',pc(c.stability))}${rowLine('Légitimité',pc(c.legitimacy))}${rowLine('Impôts',pc(c.taxRate))}${rowLine('Solde migratoire',`${(c.migrationNet||0)>=0?'+':''}${fmt(c.migrationNet||0)}`)}<div style="margin-top:14px" class="btnrow">${c.id===10?btn('Donner un ordre','orders','primary'):btn('Relations diplomatiques','open-diplomacy','ghost')}</div></div>`;}
 function provinceDetail(p){const c=country(p.countryId);return `<div class="ruler"><div class="ruler-badge"><div class="ruler-icon">⌖</div><div><div class="ruler-name">${esc(p.name)}</div><div class="ruler-small">${esc(c.short)} · ${esc(p.terrain)}</div></div></div>${rowLine('Habitants',fmt(p.population))}${rowLine('Superficie',`${fmt(p.areaKm2)} km²`)}${rowLine('Fertilité',pc(p.fertility))}${rowLine('Routes',pc(p.roads))}${rowLine('Santé',pc(p.health))}${rowLine('Scolarisation',pc(p.education))}${rowLine('Mécontentement',pc(p.unrest))}${rowLine('Bâtiments achevés',fmt(p.buildings.length))}${p.countryId===10?btn('Aménager cette province','orders','primary wide'):btn('Consulter le pays','view-country','ghost wide')}</div>`;}
