@@ -12,7 +12,7 @@ const GEMINI_MODEL=process.env.GEMINI_MODEL||'gemini-2.5-flash-lite';
 const LIMIT=Math.max(1,Math.min(200,Number(process.env.GEMINI_DAILY_LIMIT||60)));
 const INTERVAL=Math.max(6500,Number(process.env.GEMINI_INTERVAL_MS||7500));
 const READY=Boolean(GEMINI_API_KEY&&GAME_ACCESS_CODE);
-const TYPES=new Set(['policy','law','budget','project','research','recruit','demobilize','relief','explore','extract','message','gift','propose','respond','declare_war','peace','loan','trade','spy']);
+const TYPES=new Set(['policy','law','budget','project','program','embargo','lift_embargo','research','recruit','demobilize','relief','explore','extract','message','gift','propose','respond','declare_war','peace','loan','trade','spy']);
 const sessions=new Map(), failures=new Map();
 let calls=0, day='', lastCall=0;
 
@@ -61,7 +61,8 @@ const instruction=[
   'Élabore un programme national de 2 à 4 actions concrètes et différentes, par ordre de priorité. Réponds aux propositions reçues, développe les infrastructures, explore les échanges et protège les intérêts du pays. Évite les dépêches vides. Chaque action sera vérifiée et pourra être refusée par le moteur.',
   'Réponds uniquement en JSON valide de la forme {"strategy":"objectif national concis","actions":[{"type":"action","payload":{},"reason":"raison courte"}]}.',
   'type doit appartenir à allowedActions. Les cibles et identifiants doivent exister dans le contexte.',
-  'Exemples: project={"project":"routes|fermes|hopital|ecoles|eau|logement|port|mines|ateliers|fortifications","provinceId":"id"}, policy={"field":"taxRate","value":0.2}, research={"technology":"id"}, propose={"target":id,"kind":"alliance|commerce|non_agression"}, respond={"proposalId":id,"accept":true}, message={"target":id,"text":"..."}.'
+  'Un embargo sur les échanges avec un pays doit être motivé par un intérêt économique ou diplomatique concret et évalué au regard des coûts de représailles.',
+  'Exemples: program={"sector":"industrialisation|transport|agriculture|sante|education","budget":300,"duration":365,"provinceId":"id"}, embargo={"target":id}, lift_embargo={"target":id}, project={"project":"routes|fermes|hopital|ecoles|eau|logement|port|mines|ateliers|fortifications","provinceId":"id"}, policy={"field":"taxRate","value":0.2}, research={"technology":"id"}, propose={"target":id,"kind":"alliance|commerce|non_agression"}, respond={"proposalId":id,"accept":true}, message={"target":id,"text":"..."}.'
 ].join('\n');
 async function decide(input){
   const abort=AbortSignal.timeout(35000);
