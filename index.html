@@ -65,17 +65,17 @@ const CONTINENTS = [
   {id:2,name:'Thaléa',subtitle:'Littoraux, steppes et forêts',viewBox:'330 395 565 250'}
 ];
 const NATIONS = [
-  {id:0,name:'Royaume de Vael',short:'Vael',continent:0,leader:'Reine Serida II',regime:'Monarchie parlementaire',capital:'Varec',color:'#9ab5d4',corners:[[93,119],[268,111],[278,228],[83,226]],trait:'prudente',goal:'réformes civiles',population:2850000},
-  {id:1,name:'République de Dorsane',short:'Dorsane',continent:0,leader:'Premier consul Théo Marcan',regime:'République marchande',capital:'Dorane',color:'#9cb9a2',corners:[[273,107],[469,118],[469,227],[278,227]],trait:'calculateur',goal:'puissance marchande',population:3410000},
-  {id:2,name:'Principauté de Kelvorn',short:'Kelvorn',continent:0,leader:'Prince Orven III',regime:'Principauté héréditaire',capital:'Kelma',color:'#d5bd99',corners:[[85,231],[279,233],[274,351],[100,348]],trait:'méfiant',goal:'défense frontalière',population:1900000},
-  {id:3,name:'Union de Nacérie',short:'Nacérie',continent:0,leader:'Chancelière Eline Sor',regime:'Fédération provinciale',capital:'Nacrel',color:'#c2a5bd',corners:[[281,233],[469,233],[466,342],[278,351]],trait:'méthodique',goal:'éducation populaire',population:3020000},
-  {id:4,name:'Sultanat de Mazir',short:'Mazir',continent:1,leader:'Sultan Marwan al-Safir',regime:'Sultanat dynastique',capital:'Masara',color:'#d8b882',corners:[[723,105],[919,106],[922,232],[715,227]],trait:'audacieux',goal:'routes maritimes',population:2800000},
-  {id:5,name:'Ligue de Torvésie',short:'Torvésie',continent:1,leader:'Protectrice Ivara Sen',regime:'Ligue de cités',capital:'Torse',color:'#97bab1',corners:[[925,108],[1106,120],[1110,230],[930,233]],trait:'opportuniste',goal:'innovation et richesses',population:2380000},
-  {id:6,name:'Empire de Rhovanie',short:'Rhovanie',continent:1,leader:'Empereur Lucan V',regime:'Empire héréditaire',capital:'Rhovel',color:'#b4acd7',corners:[[719,235],[918,238],[920,346],[727,351]],trait:'orgueilleux',goal:'expansion régionale',population:4100000},
-  {id:7,name:'Confédération d’Ysara',short:'Ysara',continent:1,leader:'Première déléguée Alina Ker',regime:'Confédération de cantons',capital:'Ysar',color:'#d69e9b',corners:[[925,237],[1110,234],[1094,349],[925,349]],trait:'pacifique',goal:'stabilité et commerce',population:3120000},
-  {id:8,name:'Couronne de Salme',short:'Salme',continent:2,leader:'Roi Théodar IV',regime:'Monarchie militaire',capital:'Salmor',color:'#a8b8d8',corners:[[370,424],[530,421],[532,610],[384,613]],trait:'belliqueux',goal:'domination territoriale',population:2510000},
-  {id:9,name:'République de Cyralie',short:'Cyralie',continent:2,leader:'Présidente Marielle Vos',regime:'République civique',capital:'Cyral',color:'#b0c399',corners:[[535,427],[695,426],[700,610],[534,608]],trait:'diplomate',goal:'prospérité sociale',population:2970000},
-  {id:10,name:'Souveraineté d’Astérie',short:'Astérie',continent:2,leader:'Le Souverain',regime:'Souveraineté constitutionnelle',capital:'Astéria',color:'#e9c579',corners:[[703,420],[856,427],[846,604],[704,611]],trait:'joueur',goal:'défini par le joueur',population:3280000}
+  {id:0,name:'Royaume de Vael',short:'Vael',continent:0,regime:'Monarchie parlementaire',capital:'Varec',color:'#9ab5d4',corners:[[93,119],[268,111],[278,228],[83,226]],trait:'prudente',goal:'réformes civiles',population:2850000},
+  {id:1,name:'République de Dorsane',short:'Dorsane',continent:0,regime:'République marchande',capital:'Dorane',color:'#9cb9a2',corners:[[273,107],[469,118],[469,227],[278,227]],trait:'calculateur',goal:'puissance marchande',population:3410000},
+  {id:2,name:'Principauté de Kelvorn',short:'Kelvorn',continent:0,regime:'Principauté héréditaire',capital:'Kelma',color:'#d5bd99',corners:[[85,231],[279,233],[274,351],[100,348]],trait:'méfiant',goal:'défense frontalière',population:1900000},
+  {id:3,name:'Union de Nacérie',short:'Nacérie',continent:0,regime:'Fédération provinciale',capital:'Nacrel',color:'#c2a5bd',corners:[[281,233],[469,233],[466,342],[278,351]],trait:'méthodique',goal:'éducation populaire',population:3020000},
+  {id:4,name:'Sultanat de Mazir',short:'Mazir',continent:1,regime:'Sultanat dynastique',capital:'Masara',color:'#d8b882',corners:[[723,105],[919,106],[922,232],[715,227]],trait:'audacieux',goal:'routes maritimes',population:2800000},
+  {id:5,name:'Ligue de Torvésie',short:'Torvésie',continent:1,regime:'Ligue de cités',capital:'Torse',color:'#97bab1',corners:[[925,108],[1106,120],[1110,230],[930,233]],trait:'opportuniste',goal:'innovation et richesses',population:2380000},
+  {id:6,name:'Empire de Rhovanie',short:'Rhovanie',continent:1,regime:'Empire héréditaire',capital:'Rhovel',color:'#b4acd7',corners:[[719,235],[918,238],[920,346],[727,351]],trait:'orgueilleux',goal:'expansion régionale',population:4100000},
+  {id:7,name:'Confédération d’Ysara',short:'Ysara',continent:1,regime:'Confédération de cantons',capital:'Ysar',color:'#d69e9b',corners:[[925,237],[1110,234],[1094,349],[925,349]],trait:'pacifique',goal:'stabilité et commerce',population:3120000},
+  {id:8,name:'Couronne de Salme',short:'Salme',continent:2,regime:'Monarchie militaire',capital:'Salmor',color:'#a8b8d8',corners:[[370,424],[530,421],[532,610],[384,613]],trait:'belliqueux',goal:'domination territoriale',population:2510000},
+  {id:9,name:'République de Cyralie',short:'Cyralie',continent:2,regime:'République civique',capital:'Cyral',color:'#b0c399',corners:[[535,427],[695,426],[700,610],[534,608]],trait:'diplomate',goal:'prospérité sociale',population:2970000},
+  {id:10,name:'Souveraineté d’Astérie',short:'Astérie',continent:2,regime:'Souveraineté constitutionnelle',capital:'Astéria',color:'#e9c579',corners:[[703,420],[856,427],[846,604],[704,611]],trait:'joueur',goal:'défini par le joueur',population:3280000}
 ];
 const PROVINCE_PARTS=['Nord-Ouest','Nord-Est','Sud-Ouest','Sud-Est'];
 const PROJECTS={
@@ -216,7 +216,7 @@ const TECHNOLOGIES={
   nucleaire:{label:'Physique nucléaire appliquée',cost:8000,duration:700,unlock:1930}
 };
 const DEFAULT_LAWS={press:'libre',assembly:'autorisé',slavery:'interdit',conscription:'volontaire',tariff:7,judicial:'civil'};
-const ACTION_TYPES=['law','policy','budget','project','program','embargo','lift_embargo','research','recruit','demobilize','relief','explore','extract','message','gift','propose','respond','declare_war','peace','loan','trade','spy'];
+const ACTION_TYPES=['law','policy','budget','project','program','embargo','lift_embargo','research','recruit','demobilize','relief','explore','extract','message','gift','propose','respond','declare_war','peace','loan','trade','request_trade','spy'];
 
 
 const cp = obj => JSON.parse(JSON.stringify(obj));
@@ -287,7 +287,7 @@ function createWorld(seed=26101800){
     continents:cp(CONTINENTS),countries:[],agents:[],events:[],ledger:[],projects:[],orders:[],proposals:[],
     treaties:[],wars:[],intelligence:[],shipments:[],migrations:[],programs:[],market:makeMarket(),nextShipment:1,nextMigration:1,nextEvent:1,nextLedger:1,nextOrder:1,nextProject:1,nextProposal:1,nextWar:1,
     rules:{strategicMinRatio:100,startingRatio:135,geologyDoesNotImplyProduction:true,countryCount:11,continents:3},
-    mode:'local',speed:0,version:'1.3.0',notes:[]};
+    mode:'local',speed:0,version:'1.4.0',notes:[]};
   for(const n of NATIONS){
     const p=makeProvinces(s,n); const stock=getInitialReserves(s,n);
     const c={...cp(n),provinces:p,treasury:rnd(between(s,1400,3200),2),privateWealth:rnd(between(s,6500,13500),2),
@@ -314,7 +314,7 @@ function createWorld(seed=26101800){
       privateMemory:[],inbox:[],nextDecisionDay:12+c.id*2,nextGeminiDay:12+c.id*2,lastDecisionDay:0,lastSource:'contrôleur local',
       patience:rnd(between(s,.25,.85)),risk:rnd(between(s,.15,.9)),autonomy:'institutions nationales'});
   }
-  event(s,'monde','Fondation du monde : trois continents, onze États. Dix dirigeants autonomes et une souveraineté jouée.',s.countries.map(c=>c.id));
+  event(s,'monde','Fondation du monde : trois continents, onze États. Dix gouvernements autonomes et un État contrôlé par le joueur.',s.countries.map(c=>c.id));
   event(s,'resource',`Astérie dispose de tous les ${RESOURCES.length} minerais et énergies stratégiques; chaque réserve initiale dépasse au moins 100 fois celle du deuxième détenteur.`,[PLAYER_ID]);
   marketCycle(s);verifyWorld(s,{initial:true});return s;
 }
@@ -481,11 +481,11 @@ function intention(s,c,type,x){
     other.relations[c.id]=clamp(other.relations[c.id]+.075,-1,1);
     event(s,'diplomacy',`${c.short} verse ${amount} M Cr à ${other.short}.`,[c.id,other.id]);return;
   }
-  if(type==='propose'||type==='trade'||type==='loan'){
-    const other=target(s,x.target,c),kind=type==='propose'?(x.kind||'alliance'):type;
-    if(kind==='trade'&&(c.embargoes?.includes(other.id)||other.embargoes?.includes(c.id)))throw Error('Échanges interdits par un embargo');
-    if(!['alliance','non_agression','paix','commerce','trade','loan'].includes(kind))throw Error('Proposition non reconnue');
-    if(kind==='trade'){
+  if(type==='propose'||type==='trade'||type==='request_trade'||type==='loan'){
+    const other=target(s,x.target,c),kind=type==='propose'?(x.kind||'alliance'):(type==='request_trade'?'purchase_request':type);
+    if((kind==='trade'||kind==='purchase_request')&&(c.embargoes?.includes(other.id)||other.embargoes?.includes(c.id)))throw Error('Échanges interdits par un embargo');
+    if(!['alliance','non_agression','paix','commerce','trade','purchase_request','loan'].includes(kind))throw Error('Proposition non reconnue');
+    if(kind==='trade'||kind==='purchase_request'){
       if(![...RESOURCES,...COMMON].some(r=>r.id===x.resource))throw Error('Marchandise inconnue');
       if(!validNum(x.quantity,.001,100000)||!validNum(x.price,.01,10000))throw Error('Contrat de marchandises invalide');
     }
@@ -503,30 +503,29 @@ function intention(s,c,type,x){
     if(x.accept!==true && x.accept!==false)throw Error('Réponse requise');
     if(x.accept){
       const from=countryById(s,p.from),to=countryById(s,p.to);
-      if(p.kind==='trade'){
-        if(from.embargoes?.includes(to.id)||to.embargoes?.includes(from.id))throw Error('Contrat impossible : embargo en vigueur');
-        if(from.stocks[p.resource]<p.quantity)throw Error('Stock du vendeur insuffisant');
-        if(to.treasury<p.price)throw Error('Acheteur sans fonds');
-        const commercialTreaty=s.treaties.some(t=>t.active&&t.kind==='commerce'&&t.members.includes(from.id)&&t.members.includes(to.id));
-        const intercontinental=from.continent!==to.continent;
+      if(p.kind==='trade'||p.kind==='purchase_request'){
+        const seller=p.kind==='trade'?from:to,buyer=p.kind==='trade'?to:from;
+        if(seller.embargoes?.includes(buyer.id)||buyer.embargoes?.includes(seller.id))throw Error('Contrat impossible : embargo en vigueur');
+        if((seller.stocks[p.resource]||0)<p.quantity)throw Error('Stock du vendeur insuffisant');
+        if(buyer.treasury<p.price)throw Error('Acheteur sans fonds');
+        const commercialTreaty=s.treaties.some(t=>t.active&&t.kind==='commerce'&&t.members.includes(seller.id)&&t.members.includes(buyer.id));
+        const intercontinental=seller.continent!==buyer.continent;
         const routeDays=intercontinental?38:13;
-        const roadQuality=(sum(from.provinces,'roads')/from.provinces.length + sum(to.provinces,'roads')/to.provinces.length)/2;
+        const roadQuality=(sum(seller.provinces,'roads')/seller.provinces.length+sum(buyer.provinces,'roads')/buyer.provinces.length)/2;
         const travelDays=Math.max(4,Math.round(routeDays*(1.35-.48*roadQuality)*(commercialTreaty?.85:1)));
         const logistics=rnd(p.price*(intercontinental?.045:.016)*(commercialTreaty?.75:1),5);
-        // A minimal customs model: the importing merchant sector pays an import duty to its own treasury.
-        // A signed commercial treaty reduces the applicable rate, without inventing money.
-        const duty=rnd(p.price*to.tariff/100*(commercialTreaty?.65:1),5);
-        if(to.treasury+1e-7<p.price+logistics)throw Error('Acheteur sans fonds pour le prix et les transports');
-        if(to.privateWealth+1e-7<duty)throw Error('Importateurs sans fonds pour les droits de douane');
-        transfer(s,[to.id,'treasury'],[from.id,'treasury'],p.price,`Achat ${p.resource} en transit`);
-        if(logistics)transfer(s,[to.id,'treasury'],[to.id,'privateWealth'],logistics,'Transport commercial');
-        if(duty)transfer(s,[to.id,'privateWealth'],[to.id,'treasury'],duty,'Droits de douane sur importations');
-        from.stocks[p.resource]=rnd(from.stocks[p.resource]-p.quantity,5);
-        const sh={id:s.nextShipment++,contractId:p.id,from:from.id,to:to.id,resource:p.resource,quantity:p.quantity,
+        const duty=rnd(p.price*buyer.tariff/100*(commercialTreaty?.65:1),5);
+        if(buyer.treasury+1e-7<p.price+logistics)throw Error('Acheteur sans fonds pour le prix et les transports');
+        if(buyer.privateWealth+1e-7<duty)throw Error('Importateurs sans fonds pour les droits de douane');
+        transfer(s,[buyer.id,'treasury'],[seller.id,'treasury'],p.price,`Achat ${p.resource} en transit`);
+        if(logistics)transfer(s,[buyer.id,'treasury'],[buyer.id,'privateWealth'],logistics,'Transport commercial');
+        if(duty)transfer(s,[buyer.id,'privateWealth'],[buyer.id,'treasury'],duty,'Droits de douane sur importations');
+        seller.stocks[p.resource]=rnd(seller.stocks[p.resource]-p.quantity,5);
+        const sh={id:s.nextShipment++,contractId:p.id,from:seller.id,to:buyer.id,resource:p.resource,quantity:p.quantity,
           price:p.price,logistics,duty,depart:s.day,arrive:s.day+travelDays,intercontinental,status:'en transit',delivered:0,loss:0};
         s.shipments.push(sh);
-        event(s,'trade',`Une cargaison de ${p.quantity} ${p.resource} quitte ${from.short} vers ${to.short}; livraison prévue dans ${travelDays} jours.`,[from.id,to.id],{shipmentId:sh.id});
-        from.exportAnnual+=p.price;to.importAnnual+=p.price;from.tradeBalance+=p.price;to.tradeBalance-=p.price;
+        event(s,'trade',`Une cargaison de ${p.quantity} ${p.resource} quitte ${seller.short} vers ${buyer.short}; livraison prévue dans ${travelDays} jours.`,[seller.id,buyer.id],{shipmentId:sh.id});
+        seller.exportAnnual+=p.price;buyer.importAnnual+=p.price;seller.tradeBalance+=p.price;buyer.tradeBalance-=p.price;
       }else if(p.kind==='loan'){
         if(from.treasury<p.amount)throw Error('Prêteur sans liquidités');
         transfer(s,[from.id,'treasury'],[to.id,'treasury'],p.amount,'Décaissement du prêt');
@@ -585,6 +584,8 @@ function applyOrders(s){
     try{intention(s,countryById(s,o.actor),o.type,o.payload);o.status='appliqué';}
     catch(e){o.status='refusé';o.reason=e.message;event(s,'rejected',`${countryById(s,o.actor)?.short||'État'} : ordre refusé — ${e.message}.`,[o.actor]);}
     s.notes.push({day:s.day,id:o.id,status:o.status,reason:o.reason||'',kind:o.type});
+    const agent=s.agents.find(a=>a.countryId===o.actor);
+    if(agent){agent.privateMemory.push({day:s.day,action:o.type,status:o.status,reason:o.reason||'Décision exécutée'});agent.privateMemory=agent.privateMemory.slice(-60);}
   }
   s.notes=s.notes.slice(-300);
 }
@@ -793,6 +794,7 @@ function localAgentChoice(s,a){
   const open=s.proposals.find(p=>p.to===c.id&&p.status==='en attente');
   if(open){
     const favorable=open.kind==='paix'||open.kind==='non_agression'||open.kind==='commerce'||
+      (open.kind==='purchase_request'&&c.stocks[open.resource]>=open.quantity&&c.relations[open.from]>-.5)||
       (open.kind==='trade'&&c.treasury>open.price*1.8 && open.quantity>0)||
       (open.kind==='loan'&&c.treasury<1200)||
       (open.kind==='alliance'&&c.relations[open.from]>.1);
@@ -848,9 +850,11 @@ function agentView(s,countryId){
       population:p.population,roads:p.roads,farms:p.farms,health:p.health,unrest:p.unrest})),tech:c.tech.known},
     publicNeighbors:knownNeighbors,incoming:s.proposals.filter(p=>p.to===c.id&&p.status==='en attente'),
     receivedMessages:c.messages.filter(m=>m.to===c.id).slice(-8),
+    marketIndices:s.market?.index||{}, activePrograms:(s.programs||[]).filter(pr=>pr.owner===c.id&&pr.status==='en cours').map(pr=>({sector:pr.sector,spent:pr.spent,budget:pr.budget,finish:pr.finish})),
+    embargoes:c.embargoes||[],
     wars:s.wars.filter(w=>w.status==='en cours'&&w.participants.includes(c.id)),
     recentEvents:s.events.filter(e=>e.actors.includes(c.id)||e.actors.length===11).slice(-12),
-    privateMemory:a.privateMemory.slice(-20),allowedActions:['policy','law','budget','project','program','embargo','lift_embargo','research','recruit','demobilize','relief','explore','extract','message','gift','propose','respond','declare_war','peace','loan','trade','spy']};
+    privateMemory:a.privateMemory.slice(-20),allowedActions:['policy','law','budget','project','program','embargo','lift_embargo','research','recruit','demobilize','relief','explore','extract','message','gift','propose','respond','declare_war','peace','loan','trade','request_trade','spy']};
 }
 function applyAgentDecision(s,countryId,plan){
   const a=s.agents.find(z=>z.countryId===Number(countryId));if(!a)throw Error('Agent national introuvable');
@@ -890,8 +894,8 @@ function restoreWorld(value){
   for(const c of s.countries){if(!c.marketPrices)c.marketPrices={cereales:1,bois:1.2,pierre:1.1,fer:1.7,petrole:4.5};
     c.migrationNet??=0;c.immigrants??=0;c.emigrants??=0;c.embargoes??=[];c.production.mining??={};}
   for(const a of s.agents){a.nextGeminiDay??=s.day+Math.max(1,a.countryId*2);a.strategy??='Développement national';a.autonomy='institutions nationales';}
-  for(const c of s.countries){c.governanceCycle??=0;}
-  s.version='1.3.0';
+  for(const c of s.countries){c.governanceCycle??=0;delete c.leader;delete c.leaderAge;delete c.succession;}
+  s.version='1.4.0';
   verifyWorld(s);return s;
 }
 const allResources=[...RESOURCES,...COMMON];
@@ -906,7 +910,7 @@ const views=[['overview','◈','Vue générale'],['world','◉','Carte du monde'
 let s;
 try{s=restoreWorld(JSON.parse(localStorage.getItem(KEY)));}catch{s=createWorld();}
 let currentView='overview', selectedNation=10, selectedProvince=null, continentFilter='all', mapLayer='politique', runSpeed=0;
-let modal=null, notice='', noticeTimer=null, server={geminiConfigured:false,model:null}, activeAgent=false, lastAgentCall=0, agentError='', renderCount=0;
+let modal=null, notice='', noticeTimer=null, server={geminiConfigured:false,model:null}, activeAgent=false, lastAgentCall=0, geminiBackoffUntil=0, agentError='', renderCount=0;
 const app=document.querySelector('#app');
 const nfmt=new Intl.NumberFormat('fr-FR');
 const fmt=(n,d=0)=>Number.isFinite(Number(n))?new Intl.NumberFormat('fr-FR',{maximumFractionDigits:d,minimumFractionDigits:d}).format(n):'—';
@@ -949,12 +953,12 @@ function mapMarkup(){
  const capitals=visible.map(c=>{const q=c.corners;const x=q.reduce((a,p)=>a+p[0],0)/4,y=q.reduce((a,p)=>a+p[1],0)/4;return `<circle class="map-city" cx="${x}" cy="${y}" r="3.5"/><text class="nation-label" x="${x}" y="${y-12}" text-anchor="middle" style="font-size:12px">${esc(c.short)}</text>`;}).join('');
  return `<div class="map-controls">${[['all','Les 3 continents'],...CONTINENTS.map(c=>[String(c.id),c.name])].map(([id,t])=>`<button data-continent="${id}" class="${String(continentFilter)===id?'active':''}">${t}</button>`).join('')}</div><div class="map-controls layerline">${[['politique','Politique'],['population','Densité'],['stabilite','Tensions'],['agriculture','Fertilité']].map(([id,t])=>`<button data-layer="${id}" class="${mapLayer===id?'active':''}">${t}</button>`).join('')}</div><div class="map-container"><svg viewBox="${viewbox}" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Carte interactive des trois continents et des onze pays"><rect x="0" y="0" width="1200" height="690" fill="#102f41"/><path class="landmass" d="M67 99 Q143 54 261 74 L503 101 L505 267 L481 369 L280 372 L87 366 L63 241 Z"/><path class="landmass" d="M699 96 Q798 53 918 77 L1120 96 L1131 251 L1111 363 L707 368 L686 261 Z"/><path class="landmass" d="M360 409 L889 403 L894 597 L859 643 L369 638 L348 513 Z"/><text class="ocean-label" x="589" y="221" text-anchor="middle">OCÉAN</text>${label}${cells}${capitals}</svg></div><div class="map-legend"><span>◆ Astérie : votre nation</span><span>Appuyez sur une province pour l’inspecter.</span><span>Carte fictive originale, pas une carte terrestre réelle</span></div>`;
 }
-function profile(c){const x=nationalStats(c);return `<div class="ruler"><div class="ruler-badge"><div class="ruler-icon">♛</div><div><div class="ruler-name">${esc(c.leader)}</div><div class="ruler-small">${esc(c.regime)} · ${esc(c.capital)}</div><div class="ruler-small">${esc(c.short)} · ${esc(CONTINENTS[c.continent].name)}</div></div></div>${rowLine('Population',fmt(x.population))}${rowLine('Superficie',`${fmt(x.areaKm2)} km²`)}${rowLine('Trésorerie',money(c.treasury))}${rowLine('Forces armées',fmt(c.soldiers))}${rowLine('Stabilité',pc(c.stability))}${rowLine('Légitimité',pc(c.legitimacy))}${rowLine('Impôts',pc(c.taxRate))}${rowLine('Solde migratoire',`${(c.migrationNet||0)>=0?'+':''}${fmt(c.migrationNet||0)}`)}<div style="margin-top:14px" class="btnrow">${c.id===10?btn('Donner un ordre','orders','primary'):btn('Relations diplomatiques','open-diplomacy','ghost')}</div></div>`;}
+function profile(c){const x=nationalStats(c);return `<div class="ruler"><div class="ruler-badge"><div class="ruler-icon">▦</div><div><div class="ruler-name">${esc(c.name)}</div><div class="ruler-small">${esc(c.regime)} · ${esc(c.capital)}</div><div class="ruler-small">${esc(c.short)} · ${esc(CONTINENTS[c.continent].name)}</div></div></div>${rowLine('Population',fmt(x.population))}${rowLine('Superficie',`${fmt(x.areaKm2)} km²`)}${rowLine('Trésorerie',money(c.treasury))}${rowLine('Forces armées',fmt(c.soldiers))}${rowLine('Stabilité',pc(c.stability))}${rowLine('Légitimité',pc(c.legitimacy))}${rowLine('Impôts',pc(c.taxRate))}${rowLine('Solde migratoire',`${(c.migrationNet||0)>=0?'+':''}${fmt(c.migrationNet||0)}`)}<div style="margin-top:14px" class="btnrow">${c.id===10?btn('Donner un ordre','orders','primary'):btn('Relations diplomatiques','open-diplomacy','ghost')}</div></div>`;}
 function provinceDetail(p){const c=country(p.countryId);return `<div class="ruler"><div class="ruler-badge"><div class="ruler-icon">⌖</div><div><div class="ruler-name">${esc(p.name)}</div><div class="ruler-small">${esc(c.short)} · ${esc(p.terrain)}</div></div></div>${rowLine('Habitants',fmt(p.population))}${rowLine('Superficie',`${fmt(p.areaKm2)} km²`)}${rowLine('Fertilité',pc(p.fertility))}${rowLine('Routes',pc(p.roads))}${rowLine('Santé',pc(p.health))}${rowLine('Scolarisation',pc(p.education))}${rowLine('Mécontentement',pc(p.unrest))}${rowLine('Bâtiments achevés',fmt(p.buildings.length))}${p.countryId===10?btn('Aménager cette province','orders','primary wide'):btn('Consulter le pays','view-country','ghost wide')}</div>`;}
 function logs(max=7,types=[]){const array=s.events.filter(e=>!types.length||types.includes(e.kind)).slice(-max).reverse();return `<div class="chronicle">${array.length?array.map(e=>`<div class="logrow"><time>J${e.day} · ${esc(e.date)} · ${esc(e.kind)}</time><p>${esc(e.text)}</p></div>`).join(''):'<p class="empty">Aucun événement enregistré.</p>'}</div>`;}
-function overview(){const c=player(),x=nationalStats(c),dom=resourceDominance(s);return `<div class="content-stack"><div class="intro-row"><div><div class="eyebrow">Tableau de bord souverain</div><h2>${esc(c.name)}</h2><p>11 nations · 3 continents · année ${1800+Math.floor(s.day/365)} · univers fictif</p></div><span class="tag"><i class="dot ${runSpeed?'':'off'}"></i> ${runSpeed?'Simulation active':'Simulation en pause'}</span></div><div class="stats-grid">${economyKPIs(c)}</div><div class="mid-layout"><div class="panel"><div class="panel-head"><div><h3>Carte géopolitique</h3><div class="panel-sub">44 provinces initiales · frontières modifiables par les guerres</div></div>${btn('Carte complète','world','small')}</div>${mapMarkup()}</div><div class="region-right">${panel('Le souverain',selectedProvince&&prov(selectedProvince)?provinceDetail(prov(selectedProvince)):profile(country(selectedNation)))}${panel('Le rapport stratégique',`<div class="section-pad"><div class="callout">Astérie possède les ${RESOURCES.length} catégories de ressources stratégiques. À la fondation, chacune dispose d’au moins 100× la réserve du deuxième détenteur. Ce ratio n’est pas maintenu artificiellement après exploitation ou échanges.</div>${rowLine('Ressources dominantes',`${dom.filter(r=>r.second>0&&r.ratio>=100).length} / ${dom.length}`)}${rowLine('Pays pétroliers',fmt(dom.find(r=>r.id==='petrole').countriesWithDeposit))}${rowLine('Projets en cours',fmt(s.projects.filter(p=>p.status==='chantier'&&p.owner===10).length))}${rowLine('Propositions reçues',fmt(activeProposals().filter(p=>p.to===10).length))}</div>`)}</div></div><div class="content-grid">${panel('Chroniques récentes',logs(5),'Conséquences enregistrées dans le moteur',btn('Toutes les chroniques','chronicle','small'))}${panel('Classement économique',rankings(),'Tous les pays sont soumis aux mêmes calculs',btn('Comparer les États','nations','small'))}</div></div>`;}
+function overview(){const c=player(),x=nationalStats(c),dom=resourceDominance(s);return `<div class="content-stack"><div class="intro-row"><div><div class="eyebrow">Tableau de bord souverain</div><h2>${esc(c.name)}</h2><p>11 nations · 3 continents · année ${1800+Math.floor(s.day/365)} · univers fictif</p></div><span class="tag"><i class="dot ${runSpeed?'':'off'}"></i> ${runSpeed?'Simulation active':'Simulation en pause'}</span></div><div class="stats-grid">${economyKPIs(c)}</div><div class="mid-layout"><div class="panel"><div class="panel-head"><div><h3>Carte géopolitique</h3><div class="panel-sub">44 provinces initiales · frontières modifiables par les guerres</div></div>${btn('Carte complète','world','small')}</div>${mapMarkup()}</div><div class="region-right">${panel('L’État et ses institutions',selectedProvince&&prov(selectedProvince)?provinceDetail(prov(selectedProvince)):profile(country(selectedNation)))}${panel('Le rapport stratégique',`<div class="section-pad"><div class="callout">Astérie possède les ${RESOURCES.length} catégories de ressources stratégiques. À la fondation, chacune dispose d’au moins 100× la réserve du deuxième détenteur. Ce ratio n’est pas maintenu artificiellement après exploitation ou échanges.</div>${rowLine('Ressources dominantes',`${dom.filter(r=>r.second>0&&r.ratio>=100).length} / ${dom.length}`)}${rowLine('Pays pétroliers',fmt(dom.find(r=>r.id==='petrole').countriesWithDeposit))}${rowLine('Projets en cours',fmt(s.projects.filter(p=>p.status==='chantier'&&p.owner===10).length))}${rowLine('Propositions reçues',fmt(activeProposals().filter(p=>p.to===10).length))}</div>`)}</div></div><div class="content-grid">${panel('Chroniques récentes',logs(5),'Conséquences enregistrées dans le moteur',btn('Toutes les chroniques','chronicle','small'))}${panel('Classement économique',rankings(),'Tous les pays sont soumis aux mêmes calculs',btn('Comparer les États','nations','small'))}</div></div>`;}
 function world(){return `<div class="content-stack"><div class="view-title"><div><div class="eyebrow">Géographie</div><h2>Trois continents séparés</h2><p>Un seul monde · 11 souverainetés · 44 provinces au lancement</p></div></div><div class="mid-layout"><div class="panel"><div class="panel-head"><h3>Atlas politique</h3></div>${mapMarkup()}</div>${panel(selectedProvince?'Province sélectionnée':'État sélectionné',selectedProvince&&prov(selectedProvince)?provinceDetail(prov(selectedProvince)):profile(country(selectedNation)))}</div>${panel('Atlas des continents',`<div class="cards-grid section-pad">${CONTINENTS.map(x=>`<article class="mini-card"><h4>${esc(x.name)}</h4><p>${esc(x.subtitle)}</p><strong>${s.countries.filter(c=>c.continent===x.id).length} États</strong><p>${fmt(s.countries.filter(c=>c.continent===x.id).reduce((a,c)=>a+nationalStats(c).areaKm2,0))} km²</p><button class="btn small" data-continent="${x.id}" data-action="world">Explorer</button></article>`).join('')}</div>`)}</div>`;}
-function nations(){const c=country(selectedNation),x=nationalStats(c);return `<div class="content-stack"><div class="view-title"><div><div class="eyebrow">États & politique</div><h2>Les onze souverainetés</h2><p>Pas de protection spéciale pour Astérie · seuls les 10 rivaux disposent de contrôleurs IA</p></div></div>${panel('Classement des pays',rankings())}<div class="content-grid">${panel(`Dossier national : ${esc(c.short)}`,`<div class="section-pad">${details([['Régime',c.regime],['Chef de l’État',c.leader],['Population',fmt(x.population)],['Superficie',`${fmt(x.areaKm2)} km²`],['Alphabétisation',pc(c.literacy)],['Chômage',pc(c.unemployment)],['Légitimité',pc(c.legitimacy)],['Stabilité',pc(c.stability)],['Corruption',pc(c.corruption)],['Solde migratoire',`${(c.migrationNet||0)>=0?'+':''}${fmt(c.migrationNet||0)}`]])}<div class="separator"></div>${rowLine('Fiscalité',pc(c.taxRate))}${rowLine('Expression publique',esc(c.rights.press))}${rowLine('Droit de réunion',esc(c.rights.assembly))}${rowLine('Conscription',esc(c.rights.conscription))}${rowLine('Successions',esc(c.succession))}</div>`, 'Choisir une nation dans le classement')}${panel('Provinces contrôlées',`<div class="table-wrap"><table class="data-table"><thead><tr><th>Province</th><th class="num">Habitants</th><th class="num">km²</th><th class="num">Santé</th></tr></thead><tbody>${c.provinces.map(p=>`<tr class="clickable" data-province="${attr(p.id)}"><td>${esc(p.name)}</td><td class="num">${fmt(p.population)}</td><td class="num">${fmt(p.areaKm2)}</td><td class="num">${pc(p.health)}</td></tr>`).join('')}</tbody></table></div>`)}</div></div>`;}
+function nations(){const c=country(selectedNation),x=nationalStats(c);return `<div class="content-stack"><div class="view-title"><div><div class="eyebrow">États & politique</div><h2>Les onze souverainetés</h2><p>Pas de protection spéciale pour Astérie · seuls les 10 rivaux disposent de contrôleurs IA</p></div></div>${panel('Classement des pays',rankings())}<div class="content-grid">${panel(`Dossier national : ${esc(c.short)}`,`<div class="section-pad">${details([['Régime',c.regime],['Capitale',c.capital],['Population',fmt(x.population)],['Superficie',`${fmt(x.areaKm2)} km²`],['Alphabétisation',pc(c.literacy)],['Chômage',pc(c.unemployment)],['Légitimité',pc(c.legitimacy)],['Stabilité',pc(c.stability)],['Corruption',pc(c.corruption)],['Solde migratoire',`${(c.migrationNet||0)>=0?'+':''}${fmt(c.migrationNet||0)}`]])}<div class="separator"></div>${rowLine('Fiscalité',pc(c.taxRate))}${rowLine('Expression publique',esc(c.rights.press))}${rowLine('Droit de réunion',esc(c.rights.assembly))}${rowLine('Conscription',esc(c.rights.conscription))}${rowLine('Successions',esc(c.succession))}</div>`, 'Choisir une nation dans le classement')}${panel('Provinces contrôlées',`<div class="table-wrap"><table class="data-table"><thead><tr><th>Province</th><th class="num">Habitants</th><th class="num">km²</th><th class="num">Santé</th></tr></thead><tbody>${c.provinces.map(p=>`<tr class="clickable" data-province="${attr(p.id)}"><td>${esc(p.name)}</td><td class="num">${fmt(p.population)}</td><td class="num">${fmt(p.areaKm2)}</td><td class="num">${pc(p.health)}</td></tr>`).join('')}</tbody></table></div>`)}</div></div>`;}
 function resources(){const d=resourceDominance(s),c=country(selectedNation);return `<div class="content-stack"><div class="view-title"><div><div class="eyebrow">Géologie et matières premières</div><h2>18 ressources stratégiques</h2><p>Réserves dans le sol distinctes des stocks disponibles et des capacités techniques</p></div></div>${panel('Réserves géologiques et domination initiale',`<div class="table-wrap"><table class="data-table"><thead><tr><th>Ressource</th><th class="num">Astérie</th><th class="num">2e détenteur</th><th class="num">Rapport actuel</th><th class="num">Pays détenteurs</th></tr></thead><tbody>${d.map(r=>`<tr><td>${esc(r.name)} <span class="tiny muted">(${esc(r.unit)})</span></td><td class="num tint">${fmt(r.player,2)}</td><td class="num">${fmt(r.second,2)} ${r.secondCountry!==null?`<span class="muted tiny">${esc(name(r.secondCountry))}</span>`:''}</td><td class="num ${r.ratio>=100?'up':'warning'}">${r.ratio===null?'—':`${fmt(r.ratio,1)}×`}</td><td class="num">${r.countriesWithDeposit}/11</td></tr>`).join('')}</tbody></table></div>`, 'Ratio garanti au lancement, susceptible d’évoluer par extraction et conquête')}<div class="content-grid">${panel(`Inventaire : ${esc(c.short)}`,`<div class="table-wrap"><table class="data-table"><thead><tr><th>Ressource</th><th class="num">Réserve</th><th class="num">Stock extrait</th></tr></thead><tbody>${[...RESOURCES,...COMMON].map(r=>`<tr><td>${esc(r.name)}</td><td class="num">${fmt(c.reserves[r.id]||0,2)}</td><td class="num">${fmt(c.stocks[r.id]||0,3)}</td></tr>`).join('')}</tbody></table></div>`)}${panel('Exploitation minière',`<div class="section-pad"><p class="doc-note">Posséder une ressource ne signifie pas savoir l’extraire, la raffiner ou la commercialiser. Les techniques, le financement et la capacité d’exploitation doivent être disponibles.</p><div class="callout">Exemple : seuls Astérie et Mazir détiennent des gisements de pétrole au départ. Les neuf autres pays n’en ont pas.</div><div style="margin-top:13px">${btn('Lancer une prospection','orders','primary wide')}</div></div>`)}</div></div>`;}
 function economy(){const c=player(),x=nationalStats(c);return `<div class="content-stack"><div class="view-title"><div><div class="eyebrow">Ministère des finances</div><h2>Comptes publics et économie</h2><p>Unité monétaire : millions de couronnes (M Cr) · ordres de grandeur fictifs</p></div></div><div class="stats-grid">${economyKPIs(c)}</div>${panel('Programmes nationaux',`<div class="section-pad">${(s.programs||[]).filter(pr=>pr.owner===c.id).slice(-8).reverse().map(pr=>`<div class="meta-line"><span>${esc(PROGRAM_SECTORS[pr.sector]?.label||pr.sector)} · ${esc(pr.status)} · J${pr.started}–J${pr.finish}</span><strong>${money(pr.spent)} / ${money(pr.budget)}</strong></div>`).join('')||'<p class="empty">Aucun programme adopté.</p>'}<div class="separator"></div>${btn('Lancer un programme national','orders','primary')}</div>`)}<div class="content-grid">${panel('Budget et recettes',`<div class="section-pad">${rowLine('Impôt national',pc(c.taxRate))}${rowLine('Recettes du dernier jour',money(c.cashFlow.tax))}${rowLine('Services publics',money(c.cashFlow.spending))}${rowLine('Dépenses militaires',money(c.cashFlow.army))}${rowLine('Intérêts payés',money(c.cashFlow.interest))}${rowLine('Commerce extérieur (solde)',money(c.tradeBalance))}${rowLine('Patrimoine privé estimé',money(c.privateWealth))}${rowLine('Immigration totale',fmt(c.immigrants||0))}${rowLine('Émigration totale',fmt(c.emigrants||0))}${rowLine('Cargaisons en route',fmt(s.shipments.filter(sh=>sh.status==='en transit'&&(sh.from===10||sh.to===10)).length))}<div class="separator"></div>${Object.entries(c.budget).map(([k,v])=>`<div class="meta-line"><span>${esc(k)}</span><strong>${pc(v)}</strong></div><div class="meter"><span style="width:${Math.round(v*100)}%"></span></div>`).join('')}</div>`, 'Les dépenses effectivement réalisées figurent dans le journal comptable')}${panel('Grand livre · mouvements récents',`<div class="table-wrap"><table class="data-table"><thead><tr><th>Jour</th><th>Opération</th><th class="num">Montant</th></tr></thead><tbody>${s.ledger.filter(x=>x.from.startsWith('10:')||x.to.startsWith('10:')).slice(-28).reverse().map(x=>`<tr><td>J${x.day}</td><td>${esc(x.reason)}</td><td class="num">${money(x.amount)}</td></tr>`).join('')||'<tr><td colspan="3">Aucune opération enregistrée</td></tr>'}</tbody></table></div>`, 'Journal des transferts entre comptes')}
 </div>${panel('Situation des investissements',`<div class="section-pad cards-grid">${s.projects.filter(p=>p.owner===10).slice(-10).reverse().map(p=>`<div class="mini-card"><h4>${esc(p.label)}</h4><p>${esc(prov(p.provinceId)?.name||'Province inconnue')}</p><strong>${esc(p.status)}</strong> <span class="muted tiny">· J${p.finish}</span><div class="meter"><span style="width:${Math.round(p.progress*100)}%"></span></div></div>`).join('')||'<div class="empty">Aucun chantier commencé. Vous pouvez en financer un dans le menu Ordres.</div>'}</div>`)}</div>`;}
@@ -996,7 +1000,7 @@ function render(){renderCount++;app.innerHTML=shell();}
 function field(label,name,control){return `<div class="field"><label for="f-${name}">${label}</label>${control}</div>`;}
 function select(name,options){return `<select class="select" name="${name}" id="f-${name}">${options.map(([v,t])=>`<option value="${attr(v)}">${esc(t)}</option>`).join('')}</select>`;}
 function inp(name,type='number',val='',extra=''){return `<input class="input" type="${type}" name="${name}" id="f-${name}" value="${attr(val)}" ${extra} required/>`;}
-function ordersForm(){const targets=s.countries.filter(c=>c.id!==10).map(c=>[c.id,c.name]);const provinces=player().provinces.map(p=>[p.id,p.name]);const list=[['law','Adopter une loi'],['budget','Répartir le budget'],['project','Construire un bâtiment'],['program','Programme national'],['embargo','Décréter un embargo'],['lift_embargo','Lever un embargo'],['policy','Changer la fiscalité'],['research','Financer la recherche'],['recruit','Recruter des soldats'],['demobilize','Démobiliser'],['relief','Aide à la population'],['explore','Prospection'],['extract','Extraction'],['propose','Proposer un traité'],['message','Message diplomatique'],['gift','Don diplomatique'],['trade','Vendre des ressources'],['loan','Proposer un prêt'],['declare_war','Déclarer une guerre'],['peace','Demander la paix'],['spy','Mission de renseignement']];
+function ordersForm(){const targets=s.countries.filter(c=>c.id!==10).map(c=>[c.id,c.name]);const provinces=player().provinces.map(p=>[p.id,p.name]);const list=[['law','Adopter une loi'],['budget','Répartir le budget'],['project','Construire un bâtiment'],['program','Programme national'],['embargo','Décréter un embargo'],['lift_embargo','Lever un embargo'],['policy','Changer la fiscalité'],['research','Financer la recherche'],['recruit','Recruter des soldats'],['demobilize','Démobiliser'],['relief','Aide à la population'],['explore','Prospection'],['extract','Extraction'],['propose','Proposer un traité'],['message','Message diplomatique'],['gift','Don diplomatique'],['trade','Vendre des ressources'],['request_trade','Demander un achat international'],['loan','Proposer un prêt'],['declare_war','Déclarer une guerre'],['peace','Demander la paix'],['spy','Mission de renseignement']];
 const kind=modal.kind||'project';
 const other=field('Pays concerné','target',select('target',targets));
 let html='';
@@ -1015,7 +1019,7 @@ switch(kind){
  case 'propose':html=other+field('Nature de l’accord','proposalKind',select('proposalKind',[['commerce','Commerce'],['alliance','Alliance'],['non_agression','Non-agression'],['paix','Paix']]));break;
  case 'message':html=other+field('Message','text','<textarea name="text" id="f-text" class="textarea" minlength="2" maxlength="600" required>Nous souhaitons développer des relations diplomatiques.</textarea>');break;
  case 'gift':html=other+field('Montant (M Cr)','amount',inp('amount','number',30,'step="1" min="1"'));break;
- case 'trade':html=other+field('Ressource','resource',select('resource',[...RESOURCES,...COMMON].map(r=>[r.id,r.name])))+field('Quantité','quantity',inp('quantity','number',1,'step="0.01" min="0.001"'))+field('Prix total (M Cr)','price',inp('price','number',10,'step="0.01" min="0.01"'));break;
+ case 'request_trade':case 'trade':html=other+field('Ressource','resource',select('resource',[...RESOURCES,...COMMON].map(r=>[r.id,r.name])))+field('Quantité','quantity',inp('quantity','number',1,'step="0.01" min="0.001"'))+field('Prix total (M Cr)','price',inp('price','number',10,'step="0.01" min="0.01"'));break;
  case 'loan':html=other+field('Somme prêtée (M Cr)','amount',inp('amount','number',100,'min="10"'))+field('Intérêts annuels (décimal)','rate',inp('rate','number',.05,'min="0" max="0.30" step="0.01"'))+field('Échéance en jours','duration',inp('duration','number',365,'min="30" max="3650"'));break;
  default:html=other;
  }
@@ -1065,11 +1069,11 @@ async function jumpSimDays(total){
 }
 
 
-async function maybeGemini(){if(s.mode!=='gemini'||!runSpeed||!server.geminiConfigured||activeAgent)return;const now=Date.now();if(now-lastAgentCall<7000)return;const agent=s.agents.filter(a=>(a.nextGeminiDay??0)<=s.day).sort((a,b)=>(a.nextGeminiDay??0)-(b.nextGeminiDay??0))[0];if(!agent)return;
+async function maybeGemini(){if(s.mode!=='gemini'||!runSpeed||!server.geminiConfigured||activeAgent)return;const now=Date.now();if(now-lastAgentCall<7000||now<geminiBackoffUntil)return;const agent=s.agents.filter(a=>(a.nextGeminiDay??0)<=s.day).sort((a,b)=>(a.nextGeminiDay??0)-(b.nextGeminiDay??0))[0];if(!agent)return;
  activeAgent=true;lastAgentCall=now;
  try{const view=agentView(s,agent.countryId);const r=await fetch('/api/agent',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(view)});const data=await r.json();if(!r.ok)throw Error(data.error||`Erreur ${r.status}`);
  if(s.mode!=='gemini')return;applyAgentDecision(s,agent.countryId,data.decision);agentError='';save();render();}
- catch(e){agentError=e.message||'Erreur de connexion';runSpeed=0;save();message('Simulation mise en pause : Gemini ne répond pas. Vérifie les quotas ou repasse en mode local.');}
+ catch(e){agentError=e.message||'Erreur de connexion';geminiBackoffUntil=Date.now()+90000;agent.nextGeminiDay=Math.max(s.day+40,agent.nextGeminiDay||0);save();message('Gemini momentanément indisponible : les politiques nationales automatiques continuent, sans inventer de décision Gemini.');}
  finally{activeAgent=false;}
 }
 setInterval(maybeGemini,2000);
