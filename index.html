@@ -131,6 +131,11 @@ body{background:radial-gradient(ellipse at 85% -10%,#2b4b4c 0,transparent 43%),l
 .map-city{fill:#f9e6b7;stroke:#162632;stroke-width:1}
 .ocean-label{font:italic 21px Georgia,serif;letter-spacing:.2em;fill:#9bbaba;opacity:.3}
 .continent-label{font:italic 18px Georgia,serif;letter-spacing:.17em;fill:#e3d8ba;opacity:.7}
+
+.order-reports{background:#112732;border:1px solid #41616a;border-radius:7px;padding:12px 15px;display:grid;gap:8px}
+.order-report{display:flex;align-items:center;gap:12px;flex-wrap:wrap;border-bottom:1px solid #364b53;padding:8px 0;font-size:11px}
+.order-report:last-child{border:0}.order-report span{color:#b9cacf;flex:1}.order-report strong{font-size:11px}.order-report small{color:#f3ab9b;flex-basis:100%}
+.report-ok{color:#9ee6b6}.report-no{color:#f3aea4}
 </style></head><body><div id="app"><div class="boot">WORLD DYNASTY — chargement du monde</div></div><script>/* WORLD DYNASTY — Monde original, données initiales reproductibles. */
 const START_YEAR = 1800;
 const PLAYER_ID = 10;
@@ -713,7 +718,7 @@ function applyOrders(s){
   for(const o of orders){
     try{intention(s,countryById(s,o.actor),o.type,o.payload);o.status='appliqué';}
     catch(e){o.status='refusé';o.reason=e.message;event(s,'rejected',`${countryById(s,o.actor)?.short||'État'} : ordre refusé — ${e.message}.`,[o.actor]);}
-    s.notes.push({day:s.day,id:o.id,status:o.status,reason:o.reason||'',kind:o.type});
+    s.notes.push({day:s.day,id:o.id,actor:o.actor,status:o.status,reason:o.reason||'',kind:o.type});
     const agent=s.agents.find(a=>a.countryId===o.actor);
     if(agent){agent.privateMemory.push({day:s.day,action:o.type,status:o.status,reason:o.reason||'Décision exécutée'});agent.privateMemory=agent.privateMemory.slice(-60);}
   }
@@ -1146,13 +1151,25 @@ function tick(s,days=1){
 function restoreWorld(value){
   const s=typeof value==='string'?JSON.parse(value):value;
   if(!s||s.schema!==3||s.worldId!=='MD-11-3C-1800')throw Error('Sauvegarde incompatible');
+  // Migrate original rectangular 1800 provinces to continuous organic shared boundaries.
+  // Use the province's founding nation ID, not its current owner after annexation.
+  for(const c of s.countries)for(const p of c.provinces){
+    if(!Array.isArray(p.polygon)||p.polygon.length!==4)continue;
+    const match=/^p(\d+)-(\d+)$/.exec(p.id);
+    if(!match)continue;
+    const founder=NATIONS.find(n=>n.id===Number(match[1])),cell=Number(match[2]);
+    if(!founder||cell<0||cell>3)continue;
+    const u=(cell%2)*.5,v=Math.floor(cell/2)*.5;
+    p.polygon=organicProvince(founder,u,u+.5,v,v+.5);
+    p.areaKm2=Math.max(1,Math.round(polygonArea(p.polygon)*25));
+  }
   s.shipments??=[];s.migrations??=[];s.programs??=[];s.market??=makeMarket();s.disputes??=[];s.nextDispute??=s.disputes.length+1;s.archives??={shipments:0,programs:0,migrations:0,proposals:0};s.nextShipment??=s.shipments.length+1;s.nextMigration??=s.migrations.length+1;
   for(const c of s.countries){if(!c.marketPrices)c.marketPrices={cereales:1,bois:1.2,pierre:1.1,fer:1.7,petrole:4.5};
     c.migrationNet??=0;c.immigrants??=0;c.emigrants??=0;c.embargoes??=[];c.production.mining??={};}
   for(const a of s.agents){a.nextGeminiDay??=s.day+Math.max(1,a.countryId*2);a.strategy??='Développement national';a.autonomy='institutions nationales';}
   for(const c of s.countries){c.governanceCycle??=0;delete c.leader;delete c.leaderAge;delete c.succession;}
   if(s.campaign){s.campaign.completed??=[];s.campaign.victory??=false;}
-  s.version='2.0.0';
+  s.version='2.1.0';
   verifyWorld(s);return s;
 }
 const allResources=[...RESOURCES,...COMMON];
@@ -1313,12 +1330,14 @@ function gameplay(){
  const camp=s.campaign,steps=CAMPAIGN_GOALS[camp?.id]||[],count=camp?.completed?.length||0,objective=steps[count],quick=quickDecisions();
  const pending=s.proposals.filter(p=>p.status==='en attente'&&p.to===10).length;
  const latest=s.events.filter(e=>e.actors.includes(10)).slice(-1)[0];
+ const playerOrders=s.notes.filter(n=>n.actor===10).slice(-4).reverse();
  return `<section class="gameplay-shell"><div class="gameplay-title"><div><div class="gameplay-kicker">CONSEIL D’ASTÉRIE · ${esc(humanDate())}</div><h2>${camp&&steps.length?esc(CAMPAIGNS[camp.id].name):'Choisissez l’avenir du monde'}</h2><p>${camp?.victory?'Campagne remportée. Vous pouvez continuer ou recommencer une partie.':objective?esc(objective.description):'Vos décisions ont des coûts, des délais et des conséquences. Dix États agissent aussi sans vous.'}</p></div><div class="gameplay-clock"><span>DATE DU JEU</span><strong>${esc(humanDate())}</strong></div></div>
  ${steps.length?`<div class="campaign-progress">${steps.map((g,i)=>`<div class="campaign-step ${i<count?'finished':i===count?'current':''}"><b>${i<count?'✓':i+1}</b><span>${esc(g.title)}</span></div>`).join('')}</div>`:''}
  ${objective?`<div class="current-objective"><div><small>MISSION ${count+1} / ${steps.length}</small><strong>${esc(objective.title)}</strong><p>${esc(objective.description)}</p></div><button data-quick="${objective.action}" ${!quick.find(q=>q.id===objective.action)?.enabled?'disabled':''}>Agir →</button></div>`:''}
  ${camp?.victory?'<div class="victory-label">Objectifs accomplis. Votre pays reste gouvernable.</div>':''}
  <div class="decision-heading"><div><small>CONSEIL NATIONAL</small><strong>Décisions disponibles</strong></div><button data-action="orders">Autres ordres</button></div>
  <div class="quick-decisions">${quick.map(q=>`<article class="quick-card"><h3>${esc(q.label)}</h3><p>${esc(q.info)}</p><button data-quick="${q.id}" ${!q.enabled?'disabled':''} title="${esc(q.why||'Donner cet ordre')}">${q.enabled?'Donner l’ordre →':esc(q.why)}</button></article>`).join('')}</div>
+ ${playerOrders.length?`<div class="order-reports"><div class="gameplay-kicker">CONSÉQUENCES DE VOS ORDRES</div>${playerOrders.map(n=>`<div class="order-report"><span>J${n.day} · ${esc(n.kind)}</span><strong class="${n.status==='appliqué'?'report-ok':'report-no'}">${esc(n.status)}</strong>${n.reason?`<small>${esc(n.reason)}</small>`:''}</div>`).join('')}</div>`:''}
  ${pending||latest?`<div class="gameplay-notices">${pending?`<button data-view="diplomacy">${pending} proposition(s) diplomatique(s) à traiter →</button>`:''}${latest?`<span>Dernier événement : ${esc(latest.text)}</span>`:''}</div>`:''}</section>`;
 }
 
@@ -1382,13 +1401,15 @@ function snapshotIndex(){
 }
 function archiveCurrent(){
  const data=localStorage.getItem(KEY);if(!data)return true;
- const key='wd-archive-'+Date.now();const slots=snapshotIndex();
+ const key='wd-archive-'+Date.now()+'-'+Math.floor(Math.random()*10000);
+ const slots=snapshotIndex();
  try{
-  for(const old of slots.slice(2))localStorage.removeItem(old.key);
   localStorage.setItem(key,data);
   const previous=JSON.parse(data);
-  const copy=[{key,day:previous.day||0,mode:CAMPAIGNS[previous.campaign?.id]?.name||'Monde libre'},...slots.slice(0,2)];
-  localStorage.setItem(SLOT_INDEX_KEY,JSON.stringify(copy));return true;
+  const copy=[{key,day:previous.day||0,mode:CAMPAIGNS[previous.campaign?.id]?.name||'Monde libre'},...slots].slice(0,3);
+  localStorage.setItem(SLOT_INDEX_KEY,JSON.stringify(copy));
+  for(const old of slots.slice(2))if(old.key!==key)localStorage.removeItem(old.key);
+  return true;
  }catch(e){try{localStorage.removeItem(key);}catch{}return false;}
 }
 function launchNewWorld(){
@@ -1397,7 +1418,7 @@ function launchNewWorld(){
  if(previous&&!archiveCurrent()&&!confirm('Stockage plein : impossible d’archiver la partie précédente. Recommencer quand même ?'))return;
  s=createWorld((Date.now()^Math.floor(Math.random()*0xffffffff))>>>0);
  s.campaign={id:selectedCampaign,baseline:{gdp:playerNation(s).gdpAnnual,soldiers:playerNation(s).soldiers,provinces:playerNation(s).provinces.length},completed:[],victory:false};
- s.version='2.0.0';landing=false;runSpeed=0;selectedNation=10;selectedProvince=null;continentFilter='all';currentView='overview';save();render();
+ s.version='2.1.0';landing=false;runSpeed=0;selectedNation=10;selectedProvince=null;continentFilter='all';currentView='overview';save();render();
 }
 function loadArchivedWorld(key){
  const item=snapshotIndex().find(i=>i.key===key);if(!item)return;
