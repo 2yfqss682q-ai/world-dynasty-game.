@@ -285,9 +285,9 @@ function initialTech(s,c){return {levels:{agriculture:Math.round(between(s,1,3))
 function createWorld(seed=26101800){
   const s={schema:3,worldId:'MD-11-3C-1800',seed:seed>>>0,initialSeed:seed>>>0,day:0,playerId:PLAYER_ID,
     continents:cp(CONTINENTS),countries:[],agents:[],events:[],ledger:[],projects:[],orders:[],proposals:[],
-    treaties:[],wars:[],intelligence:[],shipments:[],migrations:[],programs:[],market:makeMarket(),archives:{shipments:0,programs:0,migrations:0,proposals:0},nextShipment:1,nextMigration:1,nextEvent:1,nextLedger:1,nextOrder:1,nextProject:1,nextProposal:1,nextWar:1,
+    treaties:[],wars:[],intelligence:[],shipments:[],migrations:[],programs:[],market:makeMarket(),disputes:[],nextDispute:1,archives:{shipments:0,programs:0,migrations:0,proposals:0},nextShipment:1,nextMigration:1,nextEvent:1,nextLedger:1,nextOrder:1,nextProject:1,nextProposal:1,nextWar:1,
     rules:{strategicMinRatio:100,startingRatio:135,geologyDoesNotImplyProduction:true,countryCount:11,continents:3},
-    mode:'local',speed:0,version:'1.6.0',notes:[]};
+    mode:'local',speed:0,version:'1.7.0',notes:[]};
   for(const n of NATIONS){
     const p=makeProvinces(s,n); const stock=getInitialReserves(s,n);
     const c={...cp(n),provinces:p,treasury:rnd(between(s,1400,3200),2),privateWealth:rnd(between(s,6500,13500),2),
@@ -684,23 +684,24 @@ function advanceProjects(s){
 }
 
 function geopoliticalCycle(s){
-  // Frictions entre États du monde fictif, sans privilégier Astérie.
-  const possible=[];
-  for(let i=0;i<s.countries.length;i++)for(let j=i+1;j<s.countries.length;j++){
-    const a=s.countries[i],b=s.countries[j];
-    if(a.continent!==b.continent)continue;
-    if(s.wars.some(w=>w.status==='en cours'&&w.participants.includes(a.id)&&w.participants.includes(b.id)))continue;
-    if(s.treaties.some(t=>t.active&&t.kind==='alliance'&&t.members.includes(a.id)&&t.members.includes(b.id)))continue;
-    possible.push([a,b]);
-  }
-  if(!possible.length)return;
-  const [a,b]=possible[Math.floor(random(s)*possible.length)];
-  const severity=rnd(.025+random(s)*.065,4);
-  a.relations[b.id]=clamp(rnd(a.relations[b.id]-severity,4),-1,1);
-  b.relations[a.id]=clamp(rnd(b.relations[a.id]-severity,4),-1,1);
-  const motive=(a.tariff+b.tariff>30?'hausse des barrières douanières':
-    a.stability<.45||b.stability<.45?'contentieux politique régional':'rivalité sur des routes commerciales et des zones d’influence');
-  event(s,'tension',`Incident entre ${a.short} et ${b.short} : ${motive}. Les relations bilatérales se dégradent.`,[a.id,b.id]);
+ const pairs=[];
+ for(let i=0;i<s.countries.length;i++)for(let j=i+1;j<s.countries.length;j++){
+  const a=s.countries[i],b=s.countries[j];
+  if(a.continent!==b.continent)continue;
+  if(s.wars.some(w=>w.status==='en cours'&&w.participants.includes(a.id)&&w.participants.includes(b.id)))continue;
+  if(s.treaties.some(t=>t.active&&t.kind==='alliance'&&t.members.includes(a.id)&&t.members.includes(b.id)))continue;
+  pairs.push([a,b]);
+ }
+ if(!pairs.length)return;
+ const [a,b]=pairs[Math.floor(random(s)*pairs.length)];
+ const escalation=rnd(.09+random(s)*.14,4);
+ a.relations[b.id]=clamp(rnd(a.relations[b.id]-escalation*.48,4),-1,1);
+ b.relations[a.id]=clamp(rnd(b.relations[a.id]-escalation*.48,4),-1,1);
+ const motive=a.tariff+b.tariff>30?'barrières douanières':a.stability<.45||b.stability<.45?'ingérence politique':'routes commerciales et influence régionale';
+ let dispute=(s.disputes||[]).find(d=>d.status==='actif'&&d.members.includes(a.id)&&d.members.includes(b.id));
+ if(!dispute){dispute={id:(s.nextDispute||1),members:[a.id,b.id],kind:motive,started:s.day,severity:0,status:'actif',lastIncident:s.day};s.nextDispute=(s.nextDispute||1)+1;(s.disputes??=[]).push(dispute);}
+ dispute.severity=clamp(rnd(dispute.severity+escalation,4),0,1);dispute.lastIncident=s.day;
+ event(s,'tension',`Contentieux entre ${a.short} et ${b.short} au sujet de ${motive} — intensité ${Math.round(dispute.severity*100)} %.`,[a.id,b.id],{disputeId:dispute.id});
 }
 function archiveHistory(s){
   s.archives??={shipments:0,programs:0,migrations:0,proposals:0};
@@ -1005,12 +1006,12 @@ function tick(s,days=1){
 function restoreWorld(value){
   const s=typeof value==='string'?JSON.parse(value):value;
   if(!s||s.schema!==3||s.worldId!=='MD-11-3C-1800')throw Error('Sauvegarde incompatible');
-  s.shipments??=[];s.migrations??=[];s.programs??=[];s.market??=makeMarket();s.archives??={shipments:0,programs:0,migrations:0,proposals:0};s.nextShipment??=s.shipments.length+1;s.nextMigration??=s.migrations.length+1;
+  s.shipments??=[];s.migrations??=[];s.programs??=[];s.market??=makeMarket();s.disputes??=[];s.nextDispute??=s.disputes.length+1;s.archives??={shipments:0,programs:0,migrations:0,proposals:0};s.nextShipment??=s.shipments.length+1;s.nextMigration??=s.migrations.length+1;
   for(const c of s.countries){if(!c.marketPrices)c.marketPrices={cereales:1,bois:1.2,pierre:1.1,fer:1.7,petrole:4.5};
     c.migrationNet??=0;c.immigrants??=0;c.emigrants??=0;c.embargoes??=[];c.production.mining??={};}
   for(const a of s.agents){a.nextGeminiDay??=s.day+Math.max(1,a.countryId*2);a.strategy??='Développement national';a.autonomy='institutions nationales';}
   for(const c of s.countries){c.governanceCycle??=0;delete c.leader;delete c.leaderAge;delete c.succession;}
-  s.version='1.6.0';
+  s.version='1.7.0';
   verifyWorld(s);return s;
 }
 const allResources=[...RESOURCES,...COMMON];
