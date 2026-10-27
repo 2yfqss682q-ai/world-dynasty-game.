@@ -52,14 +52,14 @@ function validateInput(x){
   return !!(x&&typeof x==='object'&&!Array.isArray(x)&&Number.isInteger(x.countryId)&&x.countryId>=0&&x.countryId<=9&&x.self&&Array.isArray(x.allowedActions)&&x.allowedActions.length<=40&&x.allowedActions.every(a=>TYPES.has(a))&&Array.isArray(x.publicNeighbors));
 }
 const instruction=[
-  'Tu joues exclusivement le souverain du pays décrit dans self.',
-  'Tu es un agent individuel indépendant des neuf autres dirigeants IA et du joueur humain.',
+  'Tu représentes exclusivement les institutions et les intérêts stratégiques du pays décrit dans self. Aucune personnalité, dynastie ou vie privée individuelle.',
+  'Tu es une IA nationale autonome, indépendante des neuf autres pays IA et du pays du joueur. Tes décisions doivent être ambitieuses, cohérentes, réalisables et non centrées sur Astérie.',
   'Tu n’as connaissance que du contexte fourni, de ta mémoire privée et des courriers que tu reçois.',
   'Poursuis tes objectifs, choisis une politique, propose une négociation, commerce, enquête, construis, réforme ou prépare une guerre selon tes priorités.',
   'Ne favorise jamais Astérie seulement parce qu’elle est le pays du joueur.',
   'Ne crée pas de monnaie, ressources, décisions d’autrui, armées ou traités fictifs.',
-  'Une seule proposition de décision, que le moteur du monde pourra accepter ou rejeter.',
-  'Réponds uniquement en JSON valide de la forme {"type":"action","payload":{},"reason":"raison courte"}.',
+  'Élabore un programme national de 2 à 4 actions concrètes et différentes, par ordre de priorité. Réponds aux propositions reçues, développe les infrastructures, explore les échanges et protège les intérêts du pays. Évite les dépêches vides. Chaque action sera vérifiée et pourra être refusée par le moteur.',
+  'Réponds uniquement en JSON valide de la forme {"strategy":"objectif national concis","actions":[{"type":"action","payload":{},"reason":"raison courte"}]}.',
   'type doit appartenir à allowedActions. Les cibles et identifiants doivent exister dans le contexte.',
   'Exemples: project={"project":"routes|fermes|hopital|ecoles|eau|logement|port|mines|ateliers|fortifications","provinceId":"id"}, policy={"field":"taxRate","value":0.2}, research={"technology":"id"}, propose={"target":id,"kind":"alliance|commerce|non_agression"}, respond={"proposalId":id,"accept":true}, message={"target":id,"text":"..."}.'
 ].join('\n');
@@ -71,15 +71,17 @@ async function decide(input){
     body:JSON.stringify({
       systemInstruction:{parts:[{text:instruction}]},
       contents:[{role:'user',parts:[{text:JSON.stringify(input)}]}],
-      generationConfig:{responseMimeType:'application/json',temperature:0.85,maxOutputTokens:850}
+      generationConfig:{responseMimeType:'application/json',temperature:0.9,maxOutputTokens:1400}
     })
   });
   const data=await res.json();
   if(!res.ok){const error=new Error(data?.error?.message||'Erreur Gemini');error.status=res.status;throw error;}
   const txt=(data?.candidates?.[0]?.content?.parts||[]).map(x=>x.text||'').join('');
-  const action=JSON.parse(txt);
-  if(!action||!TYPES.has(action.type)||!input.allowedActions.includes(action.type)||!action.payload||typeof action.payload!=='object'||Array.isArray(action.payload))throw Error('Décision Gemini invalide');
-  return {type:action.type,payload:action.payload,reason:String(action.reason||'').slice(0,240)};
+  const parsed=JSON.parse(txt);
+  const candidates=Array.isArray(parsed.actions)?parsed.actions:[parsed];
+  const actions=candidates.slice(0,4).filter(action=>action&&TYPES.has(action.type)&&input.allowedActions.includes(action.type)&&action.payload&&typeof action.payload==='object'&&!Array.isArray(action.payload)).map(action=>({type:action.type,payload:action.payload,reason:String(action.reason||'').slice(0,240)}));
+  if(!actions.length)throw Error('Programme Gemini invalide');
+  return {strategy:String(parsed.strategy||'Priorités nationales').slice(0,200),actions};
 }
 const mime={'.html':'text/html; charset=utf-8','.css':'text/css','.js':'text/javascript','.png':'image/png','.svg':'image/svg+xml','.json':'application/json'};
 const server=http.createServer(async(req,res)=>{
