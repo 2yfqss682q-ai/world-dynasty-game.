@@ -95,6 +95,30 @@ body{background:radial-gradient(ellipse at 85% -10%,#2b4b4c 0,transparent 43%),l
 .command-topbar .time-pill{padding:7px 8px}.command-topbar .more-button{width:32px}.command-topbar .new-game-btn{padding:8px 5px;font-size:10px}
 .game-launch{padding:16px 14px 70px}.launch-title{font-size:clamp(48px,14vw,74px)}.launch-blurb{font-size:13px}.launch-stage{margin-top:21px}.launch-preview{min-height:240px;padding:5px}.launch-preview .map-container svg{min-height:222px}.launch-panel{padding:18px}
 }
+
+.gameplay-shell{margin-bottom:20px;display:grid;gap:12px}
+.gameplay-title{background:radial-gradient(circle at 83% 40%,#315458,transparent 40%),linear-gradient(130deg,#203a3e,#102833 72%);border:1px solid #71827b;border-radius:10px;padding:22px 24px;display:flex;align-items:center;justify-content:space-between;gap:22px}
+.gameplay-title h2{font:400 clamp(25px,3vw,37px)/1.12 Georgia,serif;margin:10px 0;color:#f5ddaf}
+.gameplay-title p{font-size:13px;color:#c0d0ce;max-width:680px;line-height:1.5}
+.gameplay-kicker{font-size:10px;color:#edd09a;letter-spacing:.16em;font-weight:800}
+.gameplay-clock{text-align:right;min-width:150px}.gameplay-clock span{font-size:9px;letter-spacing:.15em;color:#e4c182}.gameplay-clock strong{display:block;font:400 19px Georgia,serif;color:#f4dca6;margin-top:6px}
+.campaign-progress{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.campaign-step{display:flex;gap:9px;align-items:center;background:#162c34;border:1px solid #40555b;border-radius:7px;padding:10px;opacity:.55}
+.campaign-step.current,.campaign-step.finished{opacity:1}.campaign-step.current{border-color:#eac482}.campaign-step.finished{border-color:#588c75}
+.campaign-step b{border-radius:50%;background:#2a4650;display:grid;place-items:center;min-width:25px;height:25px;color:#f5dab0}
+.campaign-step.finished b{background:#235c47;color:#baf0cf}.campaign-step span{font-size:11px;line-height:1.3}
+.current-objective{display:flex;justify-content:space-between;align-items:center;gap:16px;background:#122a34;border:1px solid #4e6768;border-radius:8px;padding:18px}
+.current-objective small{font-size:9px;color:#efc985;letter-spacing:.14em}.current-objective strong{display:block;font:400 22px Georgia,serif;margin:5px 0}.current-objective p{font-size:12px;color:#b8c9c6}
+.current-objective button{border:0;background:#e8c47f;color:#192b31;font-weight:800;border-radius:6px;padding:12px 18px;min-width:112px}.current-objective button:disabled{background:#43545b;color:#9aaeb0}
+.decision-heading{display:flex;justify-content:space-between;align-items:center}.decision-heading small{font-size:9px;color:#ecc789;letter-spacing:.15em}.decision-heading strong{font:400 23px Georgia,serif;display:block;margin-top:5px}.decision-heading button{font-size:11px;color:#f2d398;background:#203740;border:1px solid #64736c;border-radius:6px;padding:9px}
+.quick-decisions{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
+.quick-card{display:flex;flex-direction:column;min-height:149px;background:#162c35;border:1px solid #3d5860;border-radius:7px;padding:12px}
+.quick-card h3{font-size:12px;margin:0;color:#f6e5c5}.quick-card p{font-size:10px;color:#a9bdc0;line-height:1.45;flex:1}
+.quick-card button{border:1px solid #659082;background:#284e48;color:#dbf5e6;border-radius:5px;padding:8px;font-size:10px;font-weight:750}.quick-card button:disabled{border-color:#43565b;background:#26393c;color:#8ba4a7}
+.gameplay-notices{display:flex;flex-wrap:wrap;gap:10px;background:#172d34;border:1px solid #4e6463;border-radius:7px;padding:12px;font-size:11px;color:#bdccca}
+.gameplay-notices button{border:0;background:none;color:#f0d08f;text-decoration:underline;font-size:11px}.victory-label{background:#17463d;color:#d1f6e4;border:1px solid #6ba88d;padding:16px;border-radius:7px;font-size:13px}
+@media(max-width:1260px){.quick-decisions{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:700px){.quick-decisions{grid-template-columns:repeat(2,minmax(0,1fr))}.gameplay-title{padding:18px}.gameplay-clock{display:none}.campaign-step{display:block;text-align:center}.campaign-step b{margin:auto auto 6px}.campaign-step span{font-size:10px}.current-objective{display:block}.current-objective button{width:100%;margin-top:10px}}
 </style></head><body><div id="app"><div class="boot">WORLD DYNASTY — chargement du monde</div></div><script>/* WORLD DYNASTY — Monde original, données initiales reproductibles. */
 const START_YEAR = 1800;
 const PLAYER_ID = 10;
@@ -180,7 +204,7 @@ function makeMarket(){
 function marketCycle(s){
   const m=s.market??(s.market=makeMarket());
   const worldPop=sum(s.countries,population);
-  const data={day:s.day,year:START_YEAR+Math.floor(s.day/365),worldPopulation:worldPop,
+  const data={day:s.day,year:simYear(s.day),worldPopulation:worldPop,
     worldGDP:rnd(sum(s.countries,'gdpAnnual'),2),
     activeWars:s.wars.filter(w=>w.status==='en cours').length,prices:{}};
   for(const r of [...RESOURCES,...COMMON]){
@@ -310,7 +334,9 @@ function event(s,kind,text,actors=[],extra={}){
   s.events.push(ev);if(s.events.length>1000)s.events.splice(0,s.events.length-1000);
   return ev;
 }
-function dateString(day){const d=new Date(Date.UTC(START_YEAR,0,1));d.setUTCDate(d.getUTCDate()+day);return new Intl.DateTimeFormat('fr-FR',{day:'numeric',month:'long',year:'numeric',timeZone:'UTC'}).format(d);}
+function simDate(day){return new Date(Date.UTC(START_YEAR,0,1)+day*86400000);}
+function simYear(day){return simDate(day).getUTCFullYear();}
+function dateString(day){return new Intl.DateTimeFormat('fr-FR',{day:'numeric',month:'long',year:'numeric',timeZone:'UTC'}).format(simDate(day));}
 const population=c=>sum(c.provinces,'population');
 const area=c=>sum(c.provinces,'areaKm2');
 const totalWorldPopulation=s=>sum(s.countries,population);
@@ -493,7 +519,7 @@ function intention(s,c,type,x){
   }
   if(type==='research'){
     const t=TECHNOLOGIES[x.technology];if(!t)throw Error('Recherche inconnue');
-    if(START_YEAR+Math.floor(s.day/365)<t.unlock)throw Error(`Technologie prématurée (à partir de ${t.unlock})`);
+    if(simYear(s.day)<t.unlock)throw Error(`Technologie prématurée (à partir de ${t.unlock})`);
     if(c.tech.known.includes(x.technology)||c.tech.progress.some(z=>z.technology===x.technology))throw Error('Recherche déjà présente');
     if(c.treasury<t.cost)throw Error('Fonds insuffisants pour la recherche');
     spend(s,c,t.cost,`Recherche ${t.label}`);c.tech.progress.push({technology:x.technology,finish:s.day+t.duration,cost:t.cost});
@@ -1084,8 +1110,9 @@ function tick(s,days=1){
     if(s.day%180===0)geopoliticalCycle(s);
     scheduleLocalAgents(s);
     if(s.day%30===0)event(s,'chronicle',`Bilan du mois établi : ressources, activité, population, diplomatie et trésoreries actualisées.`,[]);
-    if(s.day%365===0){institutionalCycle(s);archiveHistory(s);}
+    if(simYear(s.day)!==simYear(s.day-1)){institutionalCycle(s);archiveHistory(s);}
     if(s.day%30===0)verifyWorld(s);
+    checkCampaign(s);
   }
   return s;
 }
@@ -1097,7 +1124,8 @@ function restoreWorld(value){
     c.migrationNet??=0;c.immigrants??=0;c.emigrants??=0;c.embargoes??=[];c.production.mining??={};}
   for(const a of s.agents){a.nextGeminiDay??=s.day+Math.max(1,a.countryId*2);a.strategy??='Développement national';a.autonomy='institutions nationales';}
   for(const c of s.countries){c.governanceCycle??=0;delete c.leader;delete c.leaderAge;delete c.succession;}
-  s.version='1.7.0';
+  if(s.campaign){s.campaign.completed??=[];s.campaign.victory??=false;}
+  s.version='2.0.0';
   verifyWorld(s);return s;
 }
 const allResources=[...RESOURCES,...COMMON];
@@ -1161,7 +1189,74 @@ function mapMarkup(){
 function profile(c){const x=nationalStats(c);return `<div class="ruler"><div class="ruler-badge"><div class="ruler-icon">▦</div><div><div class="ruler-name">${esc(c.name)}</div><div class="ruler-small">${esc(c.regime)} · ${esc(c.capital)}</div><div class="ruler-small">${esc(c.short)} · ${esc(CONTINENTS[c.continent].name)}</div></div></div>${rowLine('Population',fmt(x.population))}${rowLine('Superficie',`${fmt(x.areaKm2)} km²`)}${rowLine('Trésorerie',money(c.treasury))}${rowLine('Forces armées',fmt(c.soldiers))}${rowLine('Stabilité',pc(c.stability))}${rowLine('Légitimité',pc(c.legitimacy))}${rowLine('Impôts',pc(c.taxRate))}${rowLine('Solde migratoire',`${(c.migrationNet||0)>=0?'+':''}${fmt(c.migrationNet||0)}`)}<div style="margin-top:14px" class="btnrow">${c.id===10?btn('Donner un ordre','orders','primary'):btn('Relations diplomatiques','open-diplomacy','ghost')}</div></div>`;}
 function provinceDetail(p){const c=country(p.countryId);return `<div class="ruler"><div class="ruler-badge"><div class="ruler-icon">⌖</div><div><div class="ruler-name">${esc(p.name)}</div><div class="ruler-small">${esc(c.short)} · ${esc(p.terrain)}</div></div></div>${rowLine('Habitants',fmt(p.population))}${rowLine('Superficie',`${fmt(p.areaKm2)} km²`)}${rowLine('Fertilité',pc(p.fertility))}${rowLine('Routes',pc(p.roads))}${rowLine('Santé',pc(p.health))}${rowLine('Scolarisation',pc(p.education))}${rowLine('Mécontentement',pc(p.unrest))}${rowLine('Bâtiments achevés',fmt(p.buildings.length))}${p.countryId===10?btn('Aménager cette province','orders','primary wide'):btn('Consulter le pays','view-country','ghost wide')}</div>`;}
 function logs(max=7,types=[]){const array=s.events.filter(e=>!types.length||types.includes(e.kind)).slice(-max).reverse();return `<div class="chronicle">${array.length?array.map(e=>`<div class="logrow"><time>J${e.day} · ${esc(e.date)} · ${esc(e.kind)}</time><p>${esc(e.text)}</p></div>`).join(''):'<p class="empty">Aucun événement enregistré.</p>'}</div>`;}
-function overview(){const c=player(),x=nationalStats(c),dom=resourceDominance(s);return `<div class="content-stack"><div class="intro-row"><div><div class="eyebrow">Tableau de bord souverain</div><h2>${esc(c.name)}</h2><p>11 nations · 3 continents · année ${1800+Math.floor(s.day/365)} · univers fictif</p></div><span class="tag"><i class="dot ${runSpeed?'':'off'}"></i> ${runSpeed?'Simulation active':'Simulation en pause'}</span></div><div class="stats-grid">${economyKPIs(c)}</div><div class="mid-layout"><div class="panel"><div class="panel-head"><div><h3>Carte géopolitique</h3><div class="panel-sub">44 provinces initiales · frontières modifiables par les guerres</div></div>${btn('Carte complète','world','small')}</div>${mapMarkup()}</div><div class="region-right">${panel('L’État et ses institutions',selectedProvince&&prov(selectedProvince)?provinceDetail(prov(selectedProvince)):profile(country(selectedNation)))}${panel('Le rapport stratégique',`<div class="section-pad"><div class="callout">Astérie possède les ${RESOURCES.length} catégories de ressources stratégiques. À la fondation, chacune dispose d’au moins 100× la réserve du deuxième détenteur. Ce ratio n’est pas maintenu artificiellement après exploitation ou échanges.</div>${rowLine('Ressources dominantes',`${dom.filter(r=>r.second>0&&r.ratio>=100).length} / ${dom.length}`)}${rowLine('Pays pétroliers',fmt(dom.find(r=>r.id==='petrole').countriesWithDeposit))}${rowLine('Projets en cours',fmt(s.projects.filter(p=>p.status==='chantier'&&p.owner===10).length))}${rowLine('Propositions reçues',fmt(activeProposals().filter(p=>p.to===10).length))}${rowLine('Programmes nationaux actifs',fmt((s.programs||[]).filter(p=>p.owner===10&&p.status==='en cours').length))}${rowLine('Embargos en vigueur',fmt(c.embargoes?.length||0))}</div>`)}</div></div><div class="content-grid">${panel('Chroniques récentes',logs(5),'Conséquences enregistrées dans le moteur',btn('Toutes les chroniques','chronicle','small'))}${panel('Classement économique',rankings(),'Tous les pays sont soumis aux mêmes calculs',btn('Comparer les États','nations','small'))}</div></div>`;}
+
+const CAMPAIGN_GOALS={
+ industrial:[
+  {title:'Construire une manufacture',description:'Un chantier doit être achevé dans une province.',action:'manufacture',done:(s,c)=>c.provinces.some(p=>p.buildings.some(b=>b.type==='ateliers'))},
+  {title:'Développer les machines à vapeur',description:'La recherche doit réellement aboutir.',action:'vapeur',done:(s,c)=>c.tech.known.includes('vapeur')},
+  {title:'Moderniser votre économie',description:'200 M Cr dépensés dans un programme industriel et PIB supérieur de 2 % au point de départ.',action:'industrialisation',done:(s,c)=>s.programs.some(p=>p.owner===c.id&&p.sector==='industrialisation'&&p.spent>=200)&&c.gdpAnnual>=(s.campaign.baseline.gdp||1)*1.02}
+ ],
+ diplomacy:[
+  {title:'Signer un accord commercial',description:'Un autre État doit accepter votre proposition.',action:'accord',done:(s,c)=>s.treaties.some(t=>t.kind==='commerce'&&t.members.includes(c.id))},
+  {title:'Effectuer une exportation',description:'La cargaison doit arriver réellement dans un pays étranger.',action:'exportation',done:(s,c)=>s.shipments.some(t=>t.from===c.id&&t.status==='livrée')},
+  {title:'Établir un réseau diplomatique',description:'Au moins deux États étrangers sont liés à Astérie par des traités actifs.',action:'accord',done:(s,c)=>new Set(s.treaties.filter(t=>t.active&&t.members.includes(c.id)).flatMap(t=>t.members.filter(id=>id!==c.id))).size>=2}
+ ],
+ defense:[
+  {title:'Achever des fortifications',description:'Un chantier militaire construit, pas seulement ordonné.',action:'fortification',done:(s,c)=>c.provinces.some(p=>p.buildings.some(b=>b.type==='fortifications'))},
+  {title:'Recruter 1 500 militaires',description:'Renforcer les effectifs par rapport à la fondation du monde.',action:'recrutement',done:(s,c)=>c.soldiers>=s.campaign.baseline.soldiers+1500},
+  {title:'Sécuriser le pays diplomatiquement',description:'Signer un pacte défensif ou de non-agression avec une armée préparée à 60 %.',action:'pacte',done:(s,c)=>c.militaryReadiness>=.6&&s.treaties.some(t=>t.active&&['alliance','non_agression'].includes(t.kind)&&t.members.includes(c.id))}
+ ]
+};
+function checkCampaign(s){
+ const camp=s.campaign,goals=CAMPAIGN_GOALS[camp?.id];
+ if(!goals||camp.victory)return;
+ camp.completed??=[];
+ while(camp.completed.length<goals.length&&goals[camp.completed.length].done(s,playerNation(s))){
+  const step=camp.completed.length;
+  camp.completed.push({stage:step,day:s.day});
+  event(s,'campaign',`Objectif stratégique accompli : ${goals[step].title}.`,[s.playerId]);
+ }
+ if(camp.completed.length===goals.length){
+  camp.victory=true;camp.victoryDay=s.day;
+  event(s,'campaign',`Campagne ${CAMPAIGNS[camp.id].name} remportée le ${dateString(s.day)}. La partie reste jouable.`,[s.playerId]);
+ }
+}
+function quickDecisions(){
+ const c=player(),other=s.countries.filter(z=>z.id!==c.id).sort((a,b)=>c.relations[b.id]-c.relations[a.id]);
+ const least=k=>[...c.provinces].sort((a,b)=>a[k]-b[k])[0].id;
+ const project=(id,label,type,field)=>{const p=PROJECTS[type],materials=BUILD_MATERIALS[type];
+  const enough=Object.entries(materials).every(([k,n])=>(c.stocks[k]||0)>=n);
+  return {id,label,info:`${p.cost} M Cr, ${p.duration} jours · ${Object.entries(materials).map(([k,n])=>n+' '+k).join(' + ')}`,enabled:enough&&c.treasury>=p.cost,why:!enough?'Matériaux insuffisants':'Trésor insuffisant',type:'project',payload:{project:type,provinceId:least(field)}};};
+ const treaty=kind=>other.find(z=>!s.treaties.some(t=>t.active&&t.kind===kind&&t.members.includes(c.id)&&t.members.includes(z.id))&&!s.proposals.some(p=>p.from===c.id&&p.to===z.id&&p.kind===kind&&p.status==='en attente'));
+ const commerce=treaty('commerce'),pact=treaty('non_agression');
+ const customer=other.find(z=>z.treasury>50&&!c.embargoes?.includes(z.id)&&!z.embargoes?.includes(c.id));
+ return [
+  project('manufacture','Construire une manufacture','ateliers','industry'),
+  project('route','Construire des routes','routes','roads'),
+  project('ferme','Développer des fermes','fermes','farms'),
+  project('fortification','Fortifier une province','fortifications','forts'),
+  {id:'vapeur',label:'Rechercher la vapeur',info:'620 M Cr · 250 jours',enabled:c.treasury>=620&&!c.tech.known.includes('vapeur')&&!c.tech.progress.some(x=>x.technology==='vapeur'),why:'Technologie acquise, recherche en cours ou fonds insuffisants',type:'research',payload:{technology:'vapeur'}},
+  {id:'industrialisation',label:'Programme industriel',info:'300 M Cr investis sur 365 jours',enabled:c.treasury>75&&(s.programs||[]).filter(p=>p.owner===c.id&&p.status==='en cours').length<4,why:'Capacité de financement insuffisante',type:'program',payload:{sector:'industrialisation',budget:300,duration:365,provinceId:least('industry')}},
+  {id:'recrutement',label:'Recruter 1 500 soldats',info:'Coût immédiat : 7,50 M Cr · entretien ultérieur',enabled:c.treasury>=7.5&&c.soldiers+1500<population(c)*.085,why:'Fonds ou population mobilisable insuffisants',type:'recruit',payload:{count:1500}},
+  {id:'accord',label:'Proposer un traité commercial',info:`Négocier avec ${commerce?.short||'aucun État disponible'}`,enabled:!!commerce,why:'Aucun partenaire disponible',type:'propose',payload:{target:commerce?.id,kind:'commerce'}},
+  {id:'pacte',label:'Proposer un pacte',info:`Non-agression avec ${pact?.short||'aucun État disponible'}`,enabled:!!pact,why:'Aucun partenaire disponible',type:'propose',payload:{target:pact?.id,kind:'non_agression'}},
+  {id:'exportation',label:'Exporter des céréales',info:`Proposer 3 milliers de tonnes à ${customer?.short||'aucun client'}`,enabled:!!customer&&c.stocks.cereales>=3,why:'Stock ou acheteur insuffisant',type:'trade',payload:{target:customer?.id,resource:'cereales',quantity:3,price:6}}
+ ];
+}
+function gameplay(){
+ const camp=s.campaign,steps=CAMPAIGN_GOALS[camp?.id]||[],count=camp?.completed?.length||0,objective=steps[count],quick=quickDecisions();
+ const pending=s.proposals.filter(p=>p.status==='en attente'&&p.to===10).length;
+ const latest=s.events.filter(e=>e.actors.includes(10)).slice(-1)[0];
+ return `<section class="gameplay-shell"><div class="gameplay-title"><div><div class="gameplay-kicker">CONSEIL D’ASTÉRIE · ${esc(humanDate())}</div><h2>${camp&&steps.length?esc(CAMPAIGNS[camp.id].name):'Choisissez l’avenir du monde'}</h2><p>${camp?.victory?'Campagne remportée. Vous pouvez continuer ou recommencer une partie.':objective?esc(objective.description):'Vos décisions ont des coûts, des délais et des conséquences. Dix États agissent aussi sans vous.'}</p></div><div class="gameplay-clock"><span>DATE DU JEU</span><strong>${esc(humanDate())}</strong></div></div>
+ ${steps.length?`<div class="campaign-progress">${steps.map((g,i)=>`<div class="campaign-step ${i<count?'finished':i===count?'current':''}"><b>${i<count?'✓':i+1}</b><span>${esc(g.title)}</span></div>`).join('')}</div>`:''}
+ ${objective?`<div class="current-objective"><div><small>MISSION ${count+1} / ${steps.length}</small><strong>${esc(objective.title)}</strong><p>${esc(objective.description)}</p></div><button data-quick="${objective.action}" ${!quick.find(q=>q.id===objective.action)?.enabled?'disabled':''}>Agir →</button></div>`:''}
+ ${camp?.victory?'<div class="victory-label">Objectifs accomplis. Votre pays reste gouvernable.</div>':''}
+ <div class="decision-heading"><div><small>CONSEIL NATIONAL</small><strong>Décisions disponibles</strong></div><button data-action="orders">Autres ordres</button></div>
+ <div class="quick-decisions">${quick.map(q=>`<article class="quick-card"><h3>${esc(q.label)}</h3><p>${esc(q.info)}</p><button data-quick="${q.id}" ${!q.enabled?'disabled':''} title="${esc(q.why||'Donner cet ordre')}">${q.enabled?'Donner l’ordre →':esc(q.why)}</button></article>`).join('')}</div>
+ ${pending||latest?`<div class="gameplay-notices">${pending?`<button data-view="diplomacy">${pending} proposition(s) diplomatique(s) à traiter →</button>`:''}${latest?`<span>Dernier événement : ${esc(latest.text)}</span>`:''}</div>`:''}</section>`;
+}
+
+function overview(){const c=player(),x=nationalStats(c),dom=resourceDominance(s);return `<div class="content-stack">${gameplay()}<div class="intro-row"><div><div class="eyebrow">Tableau de bord souverain</div><h2>${esc(c.name)}</h2><p>11 nations · 3 continents · année ${simYear(s.day)} · univers fictif</p></div><span class="tag"><i class="dot ${runSpeed?'':'off'}"></i> ${runSpeed?'Simulation active':'Simulation en pause'}</span></div><div class="stats-grid">${economyKPIs(c)}</div><div class="mid-layout"><div class="panel"><div class="panel-head"><div><h3>Carte géopolitique</h3><div class="panel-sub">44 provinces initiales · frontières modifiables par les guerres</div></div>${btn('Carte complète','world','small')}</div>${mapMarkup()}</div><div class="region-right">${panel('L’État et ses institutions',selectedProvince&&prov(selectedProvince)?provinceDetail(prov(selectedProvince)):profile(country(selectedNation)))}${panel('Le rapport stratégique',`<div class="section-pad"><div class="callout">Astérie possède les ${RESOURCES.length} catégories de ressources stratégiques. À la fondation, chacune dispose d’au moins 100× la réserve du deuxième détenteur. Ce ratio n’est pas maintenu artificiellement après exploitation ou échanges.</div>${rowLine('Ressources dominantes',`${dom.filter(r=>r.second>0&&r.ratio>=100).length} / ${dom.length}`)}${rowLine('Pays pétroliers',fmt(dom.find(r=>r.id==='petrole').countriesWithDeposit))}${rowLine('Projets en cours',fmt(s.projects.filter(p=>p.status==='chantier'&&p.owner===10).length))}${rowLine('Propositions reçues',fmt(activeProposals().filter(p=>p.to===10).length))}${rowLine('Programmes nationaux actifs',fmt((s.programs||[]).filter(p=>p.owner===10&&p.status==='en cours').length))}${rowLine('Embargos en vigueur',fmt(c.embargoes?.length||0))}</div>`)}</div></div><div class="content-grid">${panel('Chroniques récentes',logs(5),'Conséquences enregistrées dans le moteur',btn('Toutes les chroniques','chronicle','small'))}${panel('Classement économique',rankings(),'Tous les pays sont soumis aux mêmes calculs',btn('Comparer les États','nations','small'))}</div></div>`;}
 function world(){return `<div class="content-stack"><div class="view-title"><div><div class="eyebrow">Géographie</div><h2>Trois continents séparés</h2><p>Un seul monde · 11 souverainetés · 44 provinces au lancement</p></div></div><div class="mid-layout"><div class="panel"><div class="panel-head"><h3>Atlas politique</h3></div>${mapMarkup()}</div>${panel(selectedProvince?'Province sélectionnée':'État sélectionné',selectedProvince&&prov(selectedProvince)?provinceDetail(prov(selectedProvince)):profile(country(selectedNation)))}</div>${panel('Atlas des continents',`<div class="cards-grid section-pad">${CONTINENTS.map(x=>`<article class="mini-card"><h4>${esc(x.name)}</h4><p>${esc(x.subtitle)}</p><strong>${s.countries.filter(c=>c.continent===x.id).length} États</strong><p>${fmt(s.countries.filter(c=>c.continent===x.id).reduce((a,c)=>a+nationalStats(c).areaKm2,0))} km²</p><button class="btn small" data-continent="${x.id}" data-action="world">Explorer</button></article>`).join('')}</div>`)}</div>`;}
 function nations(){const c=country(selectedNation),x=nationalStats(c);return `<div class="content-stack"><div class="view-title"><div><div class="eyebrow">États & politique</div><h2>Les onze souverainetés</h2><p>Pas de protection spéciale pour Astérie · seuls les 10 rivaux disposent de contrôleurs IA</p></div></div>${panel('Classement des pays',rankings())}<div class="content-grid">${panel(`Dossier national : ${esc(c.short)}`,`<div class="section-pad">${details([['Régime',c.regime],['Capitale',c.capital],['Population',fmt(x.population)],['Superficie',`${fmt(x.areaKm2)} km²`],['Alphabétisation',pc(c.literacy)],['Chômage',pc(c.unemployment)],['Légitimité',pc(c.legitimacy)],['Stabilité',pc(c.stability)],['Corruption',pc(c.corruption)],['Solde migratoire',`${(c.migrationNet||0)>=0?'+':''}${fmt(c.migrationNet||0)}`]])}<div class="separator"></div>${rowLine('Fiscalité',pc(c.taxRate))}${rowLine('Expression publique',esc(c.rights.press))}${rowLine('Droit de réunion',esc(c.rights.assembly))}${rowLine('Conscription',esc(c.rights.conscription))}${rowLine('Successions',esc(c.succession))}</div>`, 'Choisir une nation dans le classement')}${panel('Provinces contrôlées',`<div class="table-wrap"><table class="data-table"><thead><tr><th>Province</th><th class="num">Habitants</th><th class="num">km²</th><th class="num">Santé</th></tr></thead><tbody>${c.provinces.map(p=>`<tr class="clickable" data-province="${attr(p.id)}"><td>${esc(p.name)}</td><td class="num">${fmt(p.population)}</td><td class="num">${fmt(p.areaKm2)}</td><td class="num">${pc(p.health)}</td></tr>`).join('')}</tbody></table></div>`)}</div></div>`;}
 function resources(){const d=resourceDominance(s),c=country(selectedNation);return `<div class="content-stack"><div class="view-title"><div><div class="eyebrow">Géologie et matières premières</div><h2>18 ressources stratégiques</h2><p>Réserves dans le sol distinctes des stocks disponibles et des capacités techniques</p></div></div>${panel('Réserves géologiques et domination initiale',`<div class="table-wrap"><table class="data-table"><thead><tr><th>Ressource</th><th class="num">Astérie</th><th class="num">2e détenteur</th><th class="num">Rapport actuel</th><th class="num">Pays détenteurs</th></tr></thead><tbody>${d.map(r=>`<tr><td>${esc(r.name)} <span class="tiny muted">(${esc(r.unit)})</span></td><td class="num tint">${fmt(r.player,2)}</td><td class="num">${fmt(r.second,2)} ${r.secondCountry!==null?`<span class="muted tiny">${esc(name(r.secondCountry))}</span>`:''}</td><td class="num ${r.ratio>=100?'up':'warning'}">${r.ratio===null?'—':`${fmt(r.ratio,1)}×`}</td><td class="num">${r.countriesWithDeposit}/11</td></tr>`).join('')}</tbody></table></div>`, 'Ratio garanti au lancement, susceptible d’évoluer par extraction et conquête')}<div class="content-grid">${panel(`Inventaire : ${esc(c.short)}`,`<div class="table-wrap"><table class="data-table"><thead><tr><th>Ressource</th><th class="num">Réserve</th><th class="num">Stock extrait</th></tr></thead><tbody>${[...RESOURCES,...COMMON].map(r=>`<tr><td>${esc(r.name)}</td><td class="num">${fmt(c.reserves[r.id]||0,2)}</td><td class="num">${fmt(c.stocks[r.id]||0,3)}</td></tr>`).join('')}</tbody></table></div>`)}${panel('Exploitation minière',`<div class="section-pad"><p class="doc-note">Posséder une ressource ne signifie pas savoir l’extraire, la raffiner ou la commercialiser. Les techniques, le financement et la capacité d’exploitation doivent être disponibles.</p><div class="callout">Exemple : seuls Astérie et Mazir détiennent des gisements de pétrole au départ. Les neuf autres pays n’en ont pas.</div><div style="margin-top:13px">${btn('Lancer une prospection','orders','primary wide')}</div></div>`)}</div></div>`;}
@@ -1235,7 +1330,7 @@ function launchNewWorld(){
  if(previous&&!confirm('Nouvelle partie le 1er janvier 1800 ? Une copie de la partie précédente sera conservée si le stockage le permet.'))return;
  if(previous&&!archiveCurrent()&&!confirm('Stockage plein : impossible d’archiver la partie précédente. Recommencer quand même ?'))return;
  s=createWorld((Date.now()^Math.floor(Math.random()*0xffffffff))>>>0);
- s.campaign={id:selectedCampaign,baseline:{gdp:playerNation(s).gdpAnnual,soldiers:playerNation(s).soldiers,provinces:playerNation(s).provinces.length},victory:false};
+ s.campaign={id:selectedCampaign,baseline:{gdp:playerNation(s).gdpAnnual,soldiers:playerNation(s).soldiers,provinces:playerNation(s).provinces.length},completed:[],victory:false};
  s.version='2.0.0';landing=false;runSpeed=0;selectedNation=10;selectedProvince=null;continentFilter='all';currentView='overview';save();render();
 }
 function loadArchivedWorld(key){
@@ -1262,7 +1357,7 @@ function landingMarkup(){
 }
 
 function topbar(){const c=player();return `<header class="topbar command-topbar"><div class="location"><div class="eyebrow">WORLD DYNASTY · ${esc(CONTINENTS[c.continent].name)}</div><h1>${esc(c.short)}</h1></div>
- <div class="chronometer"><div class="chronometer-label">Date de simulation</div><strong class="chronometer-date">${esc(humanDate())}</strong><div class="chronometer-sub">Année ${1800+Math.floor(s.day/365)} · Jour ${fmt(s.day)} · ${runSpeed?'En cours':'En pause'}</div></div>
+ <div class="chronometer"><div class="chronometer-label">Date de simulation</div><strong class="chronometer-date">${esc(humanDate())}</strong><div class="chronometer-sub">Année ${simYear(s.day)} · Jour ${fmt(s.day)} · ${runSpeed?'En cours':'En pause'}</div></div>
  <div class="time-controls"><button class="time-pill ${runSpeed===0?'selected':''}" data-speed="0" title="Pause">Ⅱ</button><button class="time-pill ${runSpeed>0?'selected':''}" data-action="time-play" title="Reprendre">▶</button><select id="sim-speed" class="sim-speed" aria-label="Vitesse">${TIME_SPEEDS.map(n=>`<option value="${n}" ${selectedSpeed===n?'selected':''}>×${n}</option>`).join('')}</select><select id="jump-sim" class="sim-speed jump-speed" aria-label="Saut temporel"><option value="">Avancer…</option><option value="1">+ 1 jour</option><option value="7">+ 7 jours</option><option value="30">+ 30 jours</option><option value="365">+ 1 an</option><option value="1825">+ 5 ans</option></select><button class="more-button" data-action="orders" title="Donner un ordre">+</button><button class="new-game-btn" data-action="game-menu">Parties</button></div></header>`;}
 function shell(){const content=({overview,world,nations,resources,economy,population:populationScreen,commerce,markets,diplomacy,military,science,agents,chronicle,settings,menu})[currentView]();return `<div class="app-shell"><aside class="sidebar"><div class="brand-area"><div class="brand-title">WORLD <span class="tint">DYNASTY</span></div><div class="brand-sub">Le monde n'attend personne</div></div><nav><div class="nav-title">Le monde</div><div class="nav-list">${views.map(([id,ic,label])=>`<button class="nav-item ${currentView===id?'active':''}" data-view="${id}"><span class="nav-icon">${ic}</span> ${label}</button>`).join('')}</div></nav><div class="sidebar-footer"><div class="eyebrow">Gestion des parties</div><button class="btn primary wide" style="margin:9px 0" data-action="game-menu">Nouvelle partie / Charger</button><div class="separator"></div><div class="eyebrow">Règle fondatrice</div><p class="tiny">Aucun pays n'est protégé. Les ressources ont des quantités, les décisions des coûts et les actions des conséquences.</p><div class="tag"><i class="dot ${server.geminiConfigured?'':'off'}"></i> ${server.geminiConfigured?'Gemini disponible':'IA locale simulée'}</div></div></aside><main class="main">${topbar()}${content}</main><nav class="mobile-nav">${[['overview','◈','Accueil'],['world','◉','Carte'],['resources','◆','Ressources'],['diplomacy','✉','Diplomatie'],['nations','♜','Pays'],['menu','☷','Plus']].map(([id,ic,label])=>`<button data-view="${id}" class="${currentView===id?'active':''}"><span class="mobile-ic">${ic}</span>${label}</button>`).join('')}</nav></div>${modal?modalHtml():''}${notice?`<div class="toast">${esc(notice)}</div>`:''}`;}
 function render(){renderCount++;app.innerHTML=landing?landingMarkup():shell();}
@@ -1349,6 +1444,7 @@ setInterval(maybeGemini,2000);
 app.addEventListener('change',async e=>{if(e.target.id==='sim-speed'){const next=Number(e.target.value);if(TIME_SPEEDS.includes(next)){selectedSpeed=next;runSpeed=next;resetClock();render();}return;}if(e.target.id==='jump-sim'){const days=Number(e.target.value);e.target.value='';if(days)await jumpSimDays(days);return;}if(e.target.id==='import-save'&&e.target.files?.[0])await importWorld(e.target.files[0]);if(e.target.name==='kind'&&modal){modal.kind=e.target.value;render();}if(e.target.name==='policyField'){const node=document.querySelector('#f-value');if(node){const k=e.target.value;node.value=k==='taxRate'?player().taxRate:k==='tariff'?player().tariff:player().policy[k];}}});
 app.addEventListener('submit',e=>{if(e.target.id==='orders-form'){e.preventDefault();submitOrder(e.target);}});
 app.addEventListener('click',e=>{
+ const quick=e.target.closest('[data-quick]');if(quick){const order=quickDecisions().find(q=>q.id===quick.dataset.quick);if(!order||!order.enabled)return;try{command(s,10,order.type,order.payload);save();message('Ordre transmis : '+order.label+'. Avancez le calendrier pour appliquer la décision.');}catch(ex){message(ex.message);}return;}
  const campaign=e.target.closest('[data-campaign]');if(campaign){selectedCampaign=campaign.dataset.campaign;render();return;}
  const oldSlot=e.target.closest('[data-slot]');if(oldSlot){loadArchivedWorld(oldSlot.dataset.slot);return;}
  const kind=e.target.closest('[data-view]');if(kind){setView(kind.dataset.view);return;}
