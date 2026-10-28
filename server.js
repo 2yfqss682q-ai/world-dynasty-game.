@@ -84,10 +84,81 @@ async function decide(input){
   if(!actions.length)throw Error('Programme Gemini invalide');
   return {strategy:String(parsed.strategy||'Priorités nationales').slice(0,200),actions};
 }
+
+const SANDBOX_TYPES=new Set(['observe','move','explore','gather','build','experiment','communicate','offer_trade','accept_trade','raid']);
+function validateSandboxInput(x){
+  return Boolean(x&&typeof x==='object'&&!Array.isArray(x)&&typeof x.agentId==='string'&&/^a[0-9]{1,12}$/.test(x.agentId)&&
+    Number.isInteger(x.day)&&x.day>=0&&x.day<=5000000&&
+    x.agent&&typeof x.agent==='object'&&x.civilization&&typeof x.civilization==='object'&&
+    Array.isArray(x.observedTiles)&&x.observedTiles.length<=110&&
+    Array.isArray(x.memory)&&x.memory.length<=12&&Array.isArray(x.otherAgents)&&x.otherAgents.length<=25);
+}
+const sandboxInstruction=[
+  'Tu es un véritable agent de décision, indépendant des autres agents, dans un monde physique simulé.',
+  'Aucun rôle, aucune personnalité, aucune mission, aucune histoire, aucun objectif ne t’est imposé.',
+  'Tu reçois seulement des lois physiques, la description de ce que tu peux percevoir, les stocks observables, tes messages et ta propre mémoire.',
+  'Tu choisis librement une action possible, ou observe si tu préfères ne rien faire. Une absence de progrès est autorisée.',
+  'Toutes les ressources et actions sont soumises aux lois du moteur. Tu ne peux pas inventer des stocks, des constructions, des déplacements ou des décisions d’autrui.',
+  'Tu n’es PAS un narrateur. Ne prédis pas une évolution du monde. Sélectionne uniquement l’action que TU décides maintenant.',
+  'Actions disponibles: observe {}; move/explore {x:int,z:int}; gather {x:int,z:int,resource:"wood|stone|iron|food",amount:int de 1 à 12}; build {x:int,z:int,structure:"hut|farm|workshop|tower|mine|port"}; experiment {topic:"agriculture|metallurgie|construction|navigation|medecine"}; communicate {targetAgent:id,message:texte}; offer_trade {targetCiv:id,resource:"wood|stone|iron|food",amount:int}; accept_trade {offerId:id}; raid {targetCiv:id}.',
+  'Une action peut échouer si les conditions concrètes sont insuffisantes. Les échecs seront ajoutés à ta mémoire et te seront montrés plus tard.',
+  'Tu peux agir pour ton propre groupe, explorer, dialoguer, ne rien faire, ou expérimenter. Ce choix doit venir de toi, pas de consignes scénaristiques.',
+  'Réponds uniquement en un objet JSON {"type":"action","reason":"motivation factuelle courte",...parametres}. Pas de Markdown.'
+].join('\n');
+async function decideSandboxAgent(input){
+  const response=await fetch('https://generativelanguage.googleapis.com/v1beta/models/'+encodeURIComponent(GEMINI_MODEL)+':generateContent',{
+    method:'POST',signal:AbortSignal.timeout(35000),
+    headers:{'content-type':'application/json','x-goog-api-key':GEMINI_API_KEY},
+    body:JSON.stringify({systemInstruction:{parts:[{text:sandboxInstruction}]},contents:[{role:'user',parts:[{text:JSON.stringify(input)}]}],
+      generationConfig:{responseMimeType:'application/json',temperature:.96,maxOutputTokens:650}})
+  });
+  const json=await response.json();
+  if(!response.ok){const err=new Error(json?.error?.message||'Gemini indisponible');err.status=response.status;throw err;}
+  const txt=(json?.candidates?.[0]?.content?.parts||[]).map(p=>p.text||'').join('').trim();
+  let parsed;
+  try{parsed=JSON.parse(txt);}catch{throw new Error('La réponse Gemini ne contient pas un JSON valide');}
+  if(!parsed||typeof parsed!=='object'||Array.isArray(parsed)||!SANDBOX_TYPES.has(parsed.type))throw new Error('L’agent a proposé une action non autorisée');
+  if(JSON.stringify(parsed).length>2000)throw new Error('Réponse de l’agent trop longue');
+  const output={type:parsed.type,reason:String(parsed.reason||'Choix autonome').slice(0,180)};
+  for(const key of ['x','z','amount'])if(parsed[key]!==undefined){if(!Number.isInteger(parsed[key])||Math.abs(parsed[key])>10000)throw new Error('Coordonnées ou quantité invalides');output[key]=parsed[key];}
+  for(const key of ['resource','structure','topic','targetAgent','targetCiv','offerId','message'])if(parsed[key]!==undefined){if(typeof parsed[key]!=='string'||parsed[key].length>250)throw new Error('Paramètres invalides');output[key]=parsed[key];}
+  return output;
+}
+const sandboxFiles=new Map([
+  ['/sandbox',path.join(ROOT,'sandbox/index.html')],
+  ['/sandbox/',path.join(ROOT,'sandbox/index.html')],
+  ['/sandbox/index.html',path.join(ROOT,'sandbox/index.html')],
+  ['/sandbox/style.css',path.join(ROOT,'sandbox/style.css')],
+  ['/sandbox/game.js',path.join(ROOT,'sandbox/game.js')],
+  ['/sandbox/vendor/three.module.js',path.join(ROOT,'node_modules/three/build/three.module.js')],
+  ['/sandbox/vendor/addons/controls/OrbitControls.js',path.join(ROOT,'node_modules/three/examples/jsm/controls/OrbitControls.js')]
+]);
+
 const mime={'.html':'text/html; charset=utf-8','.css':'text/css','.js':'text/javascript','.png':'image/png','.svg':'image/svg+xml','.json':'application/json'};
 const server=http.createServer(async(req,res)=>{
   try{
     const url=new URL(req.url,'http://localhost');
+
+    if(req.method==='GET'&&url.pathname==='/sandbox/api/status'){
+      state();
+      return reply(res,200,{available:READY,authenticated:READY&&session(req),model:READY?GEMINI_MODEL:null,
+        remaining:READY?Math.max(0,LIMIT-calls):0,limit:LIMIT,minimumIntervalMs:INTERVAL,protocol:'sandbox-v1'});
+    }
+    if(req.method==='POST'&&url.pathname==='/sandbox/api/decide'){
+      if(!originAllowed(req))return reply(res,403,{error:'Origine refusée'});
+      if(!READY)return reply(res,503,{error:'Gemini non configuré'});
+      if(!session(req))return reply(res,401,{error:'Déverrouillez Gemini avec le code privé du serveur'});
+      state();
+      if(calls>=LIMIT)return reply(res,429,{error:'Limite quotidienne Gemini atteinte'});
+      if(Date.now()-lastCall<INTERVAL)return reply(res,429,{error:'Intervalle minimum entre les décisions Gemini'});
+      let input;try{input=await body(req,22000);}catch{return reply(res,400,{error:'Observation JSON invalide ou trop volumineuse'});}
+      if(!validateSandboxInput(input))return reply(res,400,{error:'Observation d’agent non conforme'});
+      lastCall=Date.now();calls++;
+      try{
+        const action=await decideSandboxAgent(input);
+        return reply(res,200,{action,remaining:Math.max(0,LIMIT-calls)});
+      }catch(e){return reply(res,e.status===429?429:502,{error:e.status===429?'Quota Google épuisé':String(e.message||'Erreur Gemini').slice(0,220)});}
+    }
     if(req.method==='GET'&&url.pathname==='/api/status'){
       state();
       return reply(res,200,{geminiAvailable:READY,geminiConfigured:READY&&session(req),authenticated:session(req),model:READY?GEMINI_MODEL:null,dailyCallsRemaining:READY?Math.max(0,LIMIT-calls):0,dailyLimit:LIMIT,protocol:'v2'});
@@ -127,9 +198,10 @@ const server=http.createServer(async(req,res)=>{
       catch(e){return reply(res,e.status===429?429:502,{error:e.status===429?'Quota Gemini épuisé':String(e.message||'Erreur IA').slice(0,250)});}
     }
     if(req.method!=='GET'&&req.method!=='HEAD')return reply(res,405,{error:'Méthode refusée'});
-    const file=url.pathname==='/'?path.join(ROOT,'index.html'):null;
+    const file=url.pathname==='/'?path.join(ROOT,'index.html'):sandboxFiles.get(url.pathname);
     if(!file)return reply(res,404,{error:'Page introuvable'});
-    res.writeHead(200,{'content-type':mime['.html'],'cache-control':'no-cache','x-content-type-options':'nosniff','referrer-policy':'same-origin'});
+    const type=mime[path.extname(file)]||'application/octet-stream';
+    res.writeHead(200,{'content-type':type,'cache-control':'no-cache','x-content-type-options':'nosniff','referrer-policy':'same-origin'});
     if(req.method==='HEAD'){res.end();return;}
     fs.createReadStream(file).on('error',()=>res.end('Erreur')).pipe(res);
   }catch(e){return reply(res,500,{error:'Erreur du serveur'});}
