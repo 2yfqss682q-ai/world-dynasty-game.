@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="theme-color" content="#0b1924"><title>CIVILISATIONS — Simulation IA</title><link rel="stylesheet" href="/sandbox/style.css">
+<script type="importmap">{"imports":{"three":"/sandbox/vendor/three.module.js","three/addons/":"/sandbox/vendor/addons/"}}</script>
+</head><body>
+<div id="boot"><div class="boot-icon">✦</div><div class="boot-name">CIVILISATIONS</div><div class="boot-sub">Initialisation du monde 3D…</div></div>
+<div id="app" class="app" hidden>
+ <div id="viewport"><canvas id="worldCanvas" aria-label="Monde 3D interactif"></canvas><div class="world-vignette"></div>
+ <div class="world-watermark">MONDE EXPÉRIMENTAL <span id="seedDisplay"></span></div>
+ <div class="world-hint" id="worldHint">Touchez une zone de terre pour intervenir sur le monde</div>
+ <div class="coord" id="coordinate">X — · Z —</div>
+ </div>
+ <header class="topbar">
+  <div class="identity"><div class="brand-glyph">✳</div><div><strong>CIVILISATIONS</strong><small>SIMULATION D'AGENTS IA</small></div></div>
+  <div class="clock"><span class="clock-label">CALENDRIER</span><strong id="dateLabel">An 1 · Jour 1</strong><small id="seasonLabel">Printemps · Monde vierge</small></div>
+  <div class="timebar"><button id="playBtn" class="control play" title="Démarrer / pause">▶</button><button class="control" data-speed="1">×1</button><button class="control" data-speed="5">×5</button><button class="control" data-speed="20">×20</button><button class="control" id="nextDay" title="Avancer de 1 jour">+1j</button></div>
+  <button class="mobile-civs-button" id="mobileCivs" aria-label="Afficher les civilisations">☰</button>
+ </header>
+ <aside id="civilizationsPanel" class="sidebar-left"><div class="panel-top"><span class="eyebrow">MONDE VIVANT</span><h2>Civilisations <span class="count" id="civCount">0</span></h2><button id="closeCivs" class="mobile-close">✕</button></div>
+ <div id="civList" class="civ-list"></div>
+ <button id="createCivSide" class="wide-add">＋ Fonder une civilisation</button>
+ <div class="left-bottom"><div class="eyebrow">INTELLIGENCE AUTONOME</div><div class="ai-status"><i id="aiLight"></i><span id="aiState">Connexion à vérifier</span></div><button id="aiUnlock" class="ai-connect">Connecter les agents Gemini</button><p class="disclaimer">Aucune action n'est inventée si Gemini est inactif. Les lois du monde continuent de s'appliquer.</p></div></aside>
+ <aside id="powersPanel" class="sidebar-right"><div class="panel-top"><span class="eyebrow">OUTILS DU CRÉATEUR</span><h2>Le monde est à vous</h2></div><div class="minimap-wrap"><canvas id="minimap" width="156" height="156" aria-label="Mini-carte"></canvas><small>VUE GÉNÉRALE DU MONDE</small></div><div class="tool-groups">
+  <div class="group-name">MODIFIER LE MONDE</div><div class="tool-grid">
+   <button class="tool active" data-tool="inspect"><span class="glyph">⌖</span><small>Observer</small></button>
+   <button class="tool" data-tool="grass"><span class="glyph">▰</span><small>Terre</small></button>
+   <button class="tool" data-tool="water"><span class="glyph">≋</span><small>Océan</small></button>
+   <button class="tool" data-tool="forest"><span class="glyph">♠</span><small>Forêt</small></button>
+   <button class="tool" data-tool="mountain"><span class="glyph">▲</span><small>Montagne</small></button>
+   <button class="tool" data-tool="fire"><span class="glyph">♨</span><small>Feu</small></button>
+  </div><div class="group-name">OFFRIR DES RESSOURCES</div><div class="tool-grid">
+   <button class="tool" data-tool="wood"><span class="glyph">♣</span><small>Bois</small></button>
+   <button class="tool" data-tool="stone"><span class="glyph">◆</span><small>Pierre</small></button>
+   <button class="tool" data-tool="iron"><span class="glyph">⬟</span><small>Fer</small></button>
+   <button class="tool" data-tool="food"><span class="glyph">❦</span><small>Nourriture</small></button>
+  </div><div class="group-name">CIVILISATIONS</div><div class="tool-grid">
+   <button class="tool" data-tool="spawn"><span class="glyph">⚑</span><small>Fonder</small></button>
+   <button class="tool" data-tool="rain"><span class="glyph">☁</span><small>Pluie</small></button>
+  </div></div><div class="gift-control"><label for="giftAmount">Quantité attribuée</label><div><input type="range" id="giftAmount" min="5" max="300" value="80" step="5"><strong id="giftNumber">80</strong></div><small>Utilisée pour les ressources et les dons aux civilisations.</small></div>
+ <div class="right-bottom"><button id="newWorld" class="secondary-action">↻ Nouveau monde</button><button id="saveWorld" class="secondary-action">↓ Exporter</button><button id="loadWorld" class="secondary-action">↑ Importer</button><input id="loadFile" type="file" accept=".json,application/json" hidden></div>
+ </aside>
+ <div id="eventPanel" class="event-panel"><div class="event-header"><span>CHRONIQUE DU MONDE</span><button id="eventsToggle" aria-label="Réduire les événements">⌄</button></div><div id="eventList" class="event-list"></div></div>
+ <div class="bottom-hud"><div class="hud-chip"><span>☼</span><div><small>HABITANTS</small><strong id="populationStat">0</strong></div></div><div class="hud-chip"><span>⚑</span><div><small>CIVILISATIONS</small><strong id="civilizationStat">0</strong></div></div><div class="hud-chip"><span>♧</span><div><small>AGENTS IA</small><strong id="agentStat">0</strong></div></div><div class="hud-chip"><span>⌁</span><div><small>DÉCISIONS GEMINI</small><strong id="decisionStat">0</strong></div></div><div class="hud-hint" id="toolStatus">Mode observation</div></div>
+ <nav class="mobile-tools" id="mobileTools"><button data-panel="civs">⚑<small>Civilisations</small></button><button data-panel="terrain">▰<small>Terrain</small></button><button data-panel="resources">◆<small>Ressources</small></button><button data-panel="agents">♧<small>Agents IA</small></button><button data-panel="menu">⚙<small>Monde</small></button></nav>
+ <div id="modalBackdrop" class="modal-backdrop" hidden><section class="modal" role="dialog" aria-modal="true"><header><div><div class="eyebrow" id="modalEyebrow">SIMULATION</div><h2 id="modalTitle">Configurer</h2></div><button id="modalClose" class="modal-close" aria-label="Fermer">✕</button></header><div id="modalContent" class="modal-content"></div></section></div>
+ <div id="toast" class="toast" hidden></div>
+</div><script type="module" src="/sandbox/game.js"></script>
+</body></html>
