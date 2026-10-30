@@ -131,6 +131,7 @@ const sandboxFiles=new Map([
   ['/sandbox/style.css',path.join(ROOT,'sandbox/style.css')],
   ['/sandbox/game.js',path.join(ROOT,'sandbox/game.js')],
   ['/sandbox/vendor/three.module.js',path.join(ROOT,'node_modules/three/build/three.module.js')],
+  ['/sandbox/vendor/three.core.js',path.join(ROOT,'node_modules/three/build/three.core.js')],
   ['/sandbox/vendor/addons/controls/OrbitControls.js',path.join(ROOT,'node_modules/three/examples/jsm/controls/OrbitControls.js')]
 ]);
 
