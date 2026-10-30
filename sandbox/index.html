@@ -43,5 +43,39 @@
  <nav class="mobile-tools" id="mobileTools"><button data-panel="civs">⚑<small>Civilisations</small></button><button data-panel="terrain">▰<small>Terrain</small></button><button data-panel="resources">◆<small>Ressources</small></button><button data-panel="agents">♧<small>Agents IA</small></button><button data-panel="menu">⚙<small>Monde</small></button></nav>
  <div id="modalBackdrop" class="modal-backdrop" hidden><section class="modal" role="dialog" aria-modal="true"><header><div><div class="eyebrow" id="modalEyebrow">SIMULATION</div><h2 id="modalTitle">Configurer</h2></div><button id="modalClose" class="modal-close" aria-label="Fermer">✕</button></header><div id="modalContent" class="modal-content"></div></section></div>
  <div id="toast" class="toast" hidden></div>
-</div><script type="module" src="/sandbox/game.js"></script>
+</div><script>
+(function(){
+  var boot=document.getElementById('boot');
+  var app=document.getElementById('app');
+  var errorBox=document.createElement('div');
+  errorBox.id='bootError';
+  errorBox.setAttribute('role','alert');
+  errorBox.style.cssText='display:none;max-width:min(90vw,460px);margin:24px 20px 0;padding:16px;text-align:center;background:#092231;border:1px solid #dfae6b;border-radius:12px;font:13px/1.5 system-ui,sans-serif;color:#eaf4ed;box-shadow:0 8px 34px #0006';
+  var details=document.createElement('p');
+  details.style.cssText='overflow-wrap:anywhere;color:#f0cf9b;margin:9px 0 14px;font-size:12px';
+  var retry=document.createElement('button');
+  retry.textContent='Réessayer de charger le monde';
+  retry.style.cssText='background:#ecc57f;color:#122530;border:0;border-radius:8px;padding:12px 17px;font-weight:800;font-size:13px;cursor:pointer';
+  retry.addEventListener('click',function(){window.location.reload();});
+  errorBox.append(details,retry);
+  boot.appendChild(errorBox);
+  var failed=false;
+  function fail(reason){
+    if(failed||!app.hidden)return;
+    failed=true;
+    boot.querySelector('.boot-sub').textContent='Impossible de démarrer le monde 3D';
+    details.textContent=String(reason||'Erreur de chargement inconnue').slice(0,350);
+    errorBox.style.display='block';
+  }
+  window.addEventListener('error',function(e){
+    var target=e.target;
+    if(target&&target!==window&&(target.tagName==='SCRIPT'||target.tagName==='LINK')){
+      fail('Une ressource nécessaire n’a pas chargé : '+(target.src||target.href||target.tagName));
+    }else if(e.message)fail(e.message);
+  },true);
+  window.addEventListener('unhandledrejection',function(e){fail((e.reason&&e.reason.message)||String(e.reason||'Erreur de module JavaScript'));});
+  window.addEventListener('civilisations:booterror',function(e){fail(e.detail||'Erreur WebGL');});
+  setTimeout(function(){if(app.hidden)fail('Le chargement du moteur graphique a dépassé 18 secondes. Vérifie la connexion, puis réessaie.');},18000);
+})();
+</script><script type="module" src="/sandbox/game.js?v=fix-core-2"></script>
 </body></html>
